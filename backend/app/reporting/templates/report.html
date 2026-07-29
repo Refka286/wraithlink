@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<style>
+  @page { margin: 2.2cm 1.8cm; }
+  body { font-family: "Helvetica Neue", Arial, sans-serif; color: #111111; font-size: 11pt; }
+  h1 { color: #b91c1c; font-size: 22pt; margin-bottom: 0; }
+  .subtitle { color: #1d4ed8; font-size: 12pt; margin-top: 4px; }
+  h2 { color: #111111; border-bottom: 2px solid #b91c1c; padding-bottom: 4px; margin-top: 28px; }
+  table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+  th { background: #111111; color: #ffffff; text-align: left; padding: 6px 8px; font-size: 9.5pt; }
+  td { padding: 6px 8px; border-bottom: 1px solid #dddddd; font-size: 9.5pt; vertical-align: top; }
+  .severity-critical { color: #ffffff; background: #b91c1c; padding: 2px 6px; border-radius: 3px; }
+  .severity-high { color: #b91c1c; font-weight: bold; }
+  .severity-medium { color: #1d4ed8; font-weight: bold; }
+  .severity-low, .severity-info { color: #444444; }
+  .meta { color: #444444; font-size: 9.5pt; }
+  .empty { color: #888888; font-style: italic; }
+</style>
+</head>
+<body>
+  <h1>AegisPen - Rapport d'Audit</h1>
+  <div class="subtitle">{{ engagement.name }}</div>
+  <p class="meta">
+    Statut de l'engagement : {{ engagement.status.value }}<br>
+    Portee validee : {{ "oui" if engagement.scope_validated else "non" }}<br>
+    Genere le : {{ generated_at }}
+  </p>
+
+  <h2>Cibles</h2>
+  {% if targets %}
+  <table>
+    <tr><th>Hote</th><th>Type</th></tr>
+    {% for target in targets %}
+    <tr><td>{{ target.host }}</td><td>{{ target.type.value }}</td></tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <p class="empty">Aucune cible declaree.</p>
+  {% endif %}
+
+  <h2>Vulnerabilites Identifiees</h2>
+  {% if findings %}
+  <table>
+    <tr><th>Type</th><th>Severite</th><th>Description</th></tr>
+    {% for finding in findings %}
+    <tr>
+      <td>{{ finding.type }}</td>
+      <td><span class="severity-{{ finding.severity.value }}">{{ finding.severity.value }}</span></td>
+      <td>{{ finding.description }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <p class="empty">Aucune vulnerabilite enregistree.</p>
+  {% endif %}
+
+  <h2>Actions Executees</h2>
+  {% if actions %}
+  <table>
+    <tr><th>Outil</th><th>Tier</th><th>Score</th><th>Statut</th></tr>
+    {% for action in actions %}
+    <tr>
+      <td>{{ action.tool }}</td>
+      <td>{{ action.tier.value if action.tier else "-" }}</td>
+      <td>{{ "%.2f"|format(action.risk_score) if action.risk_score is not none else "-" }}</td>
+      <td>{{ action.status.value }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <p class="empty">Aucune action enregistree.</p>
+  {% endif %}
+
+  <h2>Journal d'Audit</h2>
+  {% if audit_entries %}
+  <table>
+    <tr><th>Horodatage</th><th>Acteur</th><th>Evenement</th><th>Hash</th></tr>
+    {% for entry in audit_entries %}
+    <tr>
+      <td>{{ entry.created_at }}</td>
+      <td>{{ entry.actor }}</td>
+      <td>{{ entry.event_type }}</td>
+      <td class="meta">{{ entry.hash[:16] }}...</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <p class="empty">Aucune entree de journal associee.</p>
+  {% endif %}
+</body>
+</html>

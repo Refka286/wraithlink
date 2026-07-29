@@ -3,7 +3,10 @@ from app.models.enums import EngagementStatus, RiskTier
 # mirrors the state diagram in Plan_de_Travail_AegisPen.md section 6.3
 TRANSITIONS: dict[EngagementStatus, set[EngagementStatus]] = {
     EngagementStatus.scope_validation: {EngagementStatus.reconnaissance},
-    EngagementStatus.reconnaissance: {EngagementStatus.scan},
+    # approval_pending is reachable straight from reconnaissance too: a
+    # pentester can submit an approval-tier action (e.g. sqlmap aggressive)
+    # before any automatic action has moved the engagement into 'scan'.
+    EngagementStatus.reconnaissance: {EngagementStatus.scan, EngagementStatus.approval_pending},
     EngagementStatus.scan: {EngagementStatus.approval_pending, EngagementStatus.reporting},
     EngagementStatus.approval_pending: {EngagementStatus.exploitation, EngagementStatus.scan},
     EngagementStatus.exploitation: {EngagementStatus.approval_pending, EngagementStatus.reporting},
