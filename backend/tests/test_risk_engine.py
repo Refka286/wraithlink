@@ -14,6 +14,8 @@ from app.risk_engine.engine import classify_action
         ("netexec", "kerberoast", 1.2, RiskTier.approval),
         ("ad", "bruteforce-massive", 10.0, RiskTier.forbidden),
         ("netexec", "dcsync", 5.0, RiskTier.forbidden),
+        ("bloodhound", "collect", 0.4, RiskTier.automatic),
+        ("zap", "active-scan", 3.0, RiskTier.approval),
     ],
 )
 def test_classify_action_matches_plan_examples(tool, profile, expected_score, expected_tier):

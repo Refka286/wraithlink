@@ -23,8 +23,10 @@ DEFAULT_PROFILES = {
     "nmap": "syn-stealth",
     "ffuf": "default",
     "nuclei": "default",
-    "sqlmap": "default",
-    "netexec": "default",
+    "sqlmap": "aggressive",
+    "netexec": "kerberoast",
+    "bloodhound": "collect",
+    "zap": "active-scan",
 }
 
 

@@ -55,7 +55,9 @@ class ToolAdapter(ABC):
         ...
 
     @abstractmethod
-    def parse_output(self, output_path: Path, raw_stdout: str) -> list[dict[str, Any]]:
+    def parse_output(
+        self, adapter_input: AdapterInput, output_path: Path, raw_stdout: str
+    ) -> list[dict[str, Any]]:
         ...
 
     def _check_binary(self) -> None:
@@ -66,6 +68,14 @@ class ToolAdapter(ABC):
         base = Path(get_settings().evidence_storage_path) / engagement_id
         base.mkdir(parents=True, exist_ok=True)
         return base
+
+    def working_directory(self, output_path: Path) -> Path | None:
+        """
+        Override for tools that write their own output files by name into
+        the current working directory instead of accepting an explicit
+        output path (BloodHound's collector is the case that needs this).
+        """
+        return None
 
     def run(self, adapter_input: AdapterInput) -> AdapterOutput:
         started_at = datetime.now(timezone.utc).isoformat()
@@ -86,6 +96,7 @@ class ToolAdapter(ABC):
         output_path = output_dir / f"{self.binary_name}-{run_id}.out"
 
         command = self.build_command(adapter_input, output_path)
+        cwd = self.working_directory(output_path)
 
         try:
             completed = subprocess.run(
@@ -94,6 +105,7 @@ class ToolAdapter(ABC):
                 text=True,
                 timeout=adapter_input.params.get("timeout_seconds", 300),
                 check=False,
+                cwd=str(cwd) if cwd else None,
             )
         except subprocess.TimeoutExpired as exc:
             return AdapterOutput(
@@ -118,7 +130,7 @@ class ToolAdapter(ABC):
                 error=completed.stderr.strip() or f"exit code {completed.returncode}",
             )
 
-        findings = self.parse_output(output_path, completed.stdout)
+        findings = self.parse_output(adapter_input, output_path, completed.stdout)
 
         return AdapterOutput(
             status="success",

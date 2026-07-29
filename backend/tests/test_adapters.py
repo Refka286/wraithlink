@@ -6,6 +6,16 @@ from app.adapters.ffuf import FfufAdapter
 from app.adapters.nmap import NmapAdapter
 from app.adapters.nuclei import NucleiAdapter
 
+def dummy_input(tool: str, params: dict | None = None) -> AdapterInput:
+    return AdapterInput(
+        tool=tool,
+        target="10.10.10.5",
+        params=params or {},
+        risk_tier="automatic",
+        engagement_id="test-engagement",
+    )
+
+
 NMAP_XML = """<?xml version="1.0"?>
 <nmaprun>
   <host>
@@ -28,7 +38,7 @@ def test_nmap_parse_output_keeps_only_open_ports(tmp_path: Path):
     xml_path = tmp_path / "nmap.xml"
     xml_path.write_text(NMAP_XML, encoding="utf-8")
 
-    findings = NmapAdapter().parse_output(xml_path, "")
+    findings = NmapAdapter().parse_output(dummy_input("nmap"), xml_path, "")
 
     assert findings == [
         {"type": "open_port", "port": 445, "service": "smb", "confidence": "high"}
@@ -36,7 +46,7 @@ def test_nmap_parse_output_keeps_only_open_ports(tmp_path: Path):
 
 
 def test_nmap_parse_output_missing_file_returns_empty(tmp_path: Path):
-    findings = NmapAdapter().parse_output(tmp_path / "missing.xml", "")
+    findings = NmapAdapter().parse_output(dummy_input("nmap"), tmp_path / "missing.xml", "")
     assert findings == []
 
 
@@ -53,7 +63,7 @@ def test_ffuf_parse_output(tmp_path: Path):
         encoding="utf-8",
     )
 
-    findings = FfufAdapter().parse_output(output_path, "")
+    findings = FfufAdapter().parse_output(dummy_input("ffuf"), output_path, "")
 
     assert findings == [
         {
@@ -75,7 +85,7 @@ def test_nuclei_parse_output(tmp_path: Path):
     }
     output_path.write_text(json.dumps(record) + "\n", encoding="utf-8")
 
-    findings = NucleiAdapter().parse_output(output_path, "")
+    findings = NucleiAdapter().parse_output(dummy_input("nuclei"), output_path, "")
 
     assert findings == [
         {

@@ -14,6 +14,13 @@ CATALOG: dict[str, RiskRating] = {
     "ffuf:default": RiskRating(impact=1, detectability=3, reversibility=5),
     "nuclei:default": RiskRating(impact=1, detectability=2, reversibility=5),
     "nuclei:aggressive": RiskRating(impact=3, detectability=4, reversibility=4),
+    # BloodHound collection is LDAP/SMB enumeration with a valid low-priv
+    # account, same nature as the anonymous LDAP enum example above
+    "bloodhound:collect": RiskRating(impact=1, detectability=2, reversibility=5),
+    # a ZAP full/active scan sends live attack traffic, same nature as the
+    # sqlmap:aggressive entry - the plan explicitly keeps this out of the
+    # automatic tier regardless of numeric score
+    "zap:active-scan": RiskRating(impact=3, detectability=4, reversibility=4, sensitive=True),
 }
 
 

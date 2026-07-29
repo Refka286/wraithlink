@@ -21,7 +21,9 @@ class FfufAdapter(ToolAdapter):
             "-noninteractive",
         ]
 
-    def parse_output(self, output_path: Path, raw_stdout: str) -> list[dict[str, Any]]:
+    def parse_output(
+        self, adapter_input: AdapterInput, output_path: Path, raw_stdout: str
+    ) -> list[dict[str, Any]]:
         if not output_path.exists() or output_path.stat().st_size == 0:
             return []
 
