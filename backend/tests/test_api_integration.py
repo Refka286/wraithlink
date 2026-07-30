@@ -95,7 +95,7 @@ def test_automatic_action_moves_engagement_to_scan(client, auth_headers):
         json={
             "engagement_id": engagement["id"],
             "tool": "nmap",
-            "params": {"profile": "syn-stealth"},
+            "params": {"profile": "syn-stealth", "target": "10.10.10.5"},
         },
         headers=auth_headers,
     )
@@ -120,7 +120,7 @@ def test_approval_tier_action_pauses_engagement_until_decision(client, auth_head
         json={
             "engagement_id": engagement["id"],
             "tool": "sqlmap",
-            "params": {"profile": "aggressive"},
+            "params": {"profile": "aggressive", "target": "http://target.local/login"},
         },
         headers=auth_headers,
     ).json()
@@ -151,7 +151,11 @@ def test_forbidden_action_is_blocked_and_leaves_engagement_untouched(client, aut
 
     action = client.post(
         "/actions",
-        json={"engagement_id": engagement["id"], "tool": "netexec", "params": {"profile": "dcsync"}},
+        json={
+            "engagement_id": engagement["id"],
+            "tool": "netexec",
+            "params": {"profile": "dcsync", "target": "dc01.goad.local"},
+        },
         headers=auth_headers,
     ).json()
     assert action["tier"] == "forbidden"
@@ -180,3 +184,43 @@ def test_reader_cannot_create_engagement(db, client):
         headers={"Authorization": f"Bearer {token}"},
     )
     assert response.status_code == 403
+
+
+def test_submit_action_without_any_target_is_rejected(client, auth_headers):
+    engagement = client.post(
+        "/engagements",
+        json={"name": "No Target Engagement", "scope_validated": True, "targets": []},
+        headers=auth_headers,
+    ).json()
+
+    response = client.post(
+        "/actions",
+        json={"engagement_id": engagement["id"], "tool": "nmap", "params": {"profile": "syn-stealth"}},
+        headers=auth_headers,
+    )
+    assert response.status_code == 400
+
+
+def test_submit_action_with_target_id_does_not_require_params_target(client, auth_headers):
+    engagement = client.post(
+        "/engagements",
+        json={
+            "name": "Target Id Engagement",
+            "scope_validated": True,
+            "targets": [{"host": "10.10.10.9", "type": "web"}],
+        },
+        headers=auth_headers,
+    ).json()
+    target_id = engagement["targets"][0]["id"]
+
+    response = client.post(
+        "/actions",
+        json={
+            "engagement_id": engagement["id"],
+            "target_id": target_id,
+            "tool": "nmap",
+            "params": {"profile": "syn-stealth"},
+        },
+        headers=auth_headers,
+    )
+    assert response.status_code == 201

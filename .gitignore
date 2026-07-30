@@ -1,4 +1,5 @@
 .env
+docker-compose.override.yml
 __pycache__/
 *.pyc
 .venv/
@@ -9,8 +10,10 @@ venv/
 node_modules/
 dist/
 .vite/
+*.tsbuildinfo
 
 evidence/
 *.db
 
 .DS_Store
+.claude/

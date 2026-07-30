@@ -40,6 +40,12 @@ def submit_action(
     if engagement is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="engagement not found")
 
+    if payload.target_id is None and "target" not in payload.params:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="either target_id or params.target must be provided",
+        )
+
     profile = payload.params.get("profile", DEFAULT_PROFILES.get(payload.tool, "default"))
 
     try:
