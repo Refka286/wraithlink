@@ -1,0 +1,751 @@
+<title>AegisPen — Rapport de Session d'Implémentation</title>
+<style>
+  @media (prefers-color-scheme: light) {
+    :root { color-scheme: light; }
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { color-scheme: dark; }
+  }
+
+  :root {
+    --paper: #faf9f6;
+    --paper-raised: #ffffff;
+    --ink-950: #0b0b0d;
+    --ink-800: #1f1f24;
+    --ink-600: #48484f;
+    --ink-400: #7a7a82;
+    --ink-200: #d8d7d2;
+    --ink-100: #eae8e3;
+    --rule: #ddd9d0;
+    --red: #b91c1c;
+    --red-ground: #fdf0ef;
+    --red-ink: #7f1815;
+    --blue: #1d4ed8;
+    --blue-ground: #eef2fd;
+    --blue-ink: #1e3a8a;
+    --mono-ground: #17171b;
+    --mono-ink: #e7e6e2;
+    --mono-accent: #ff8a80;
+    --mono-accent-2: #7ea6ff;
+
+    --display: Charter, "Iowan Old Style", "Palatino Linotype", Georgia, "Times New Roman", serif;
+    --body: -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", Consolas, "Liberation Mono", monospace;
+  }
+
+  :root[data-theme="dark"] {
+    --paper: #101012;
+    --paper-raised: #17171a;
+    --ink-950: #f3f2ee;
+    --ink-800: #d9d8d3;
+    --ink-600: #a8a7a2;
+    --ink-400: #79797a;
+    --ink-200: #333336;
+    --ink-100: #232326;
+    --rule: #2c2c2f;
+    --red: #ef6a63;
+    --red-ground: #2a1614;
+    --red-ink: #ff9d95;
+    --blue: #6d93ff;
+    --blue-ground: #131c33;
+    --blue-ink: #a9c0ff;
+    --mono-ground: #0a0a0c;
+    --mono-ink: #e7e6e2;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #101012;
+      --paper-raised: #17171a;
+      --ink-950: #f3f2ee;
+      --ink-800: #d9d8d3;
+      --ink-600: #a8a7a2;
+      --ink-400: #79797a;
+      --ink-200: #333336;
+      --ink-100: #232326;
+      --rule: #2c2c2f;
+      --red: #ef6a63;
+      --red-ground: #2a1614;
+      --red-ink: #ff9d95;
+      --blue: #6d93ff;
+      --blue-ground: #131c33;
+      --blue-ink: #a9c0ff;
+      --mono-ground: #0a0a0c;
+      --mono-ink: #e7e6e2;
+    }
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink-800);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: var(--blue); }
+  a:focus-visible, button:focus-visible, summary:focus-visible {
+    outline: 2px solid var(--blue);
+    outline-offset: 2px;
+  }
+
+  .shell {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 24px 96px;
+  }
+
+  @media (min-width: 980px) {
+    .shell {
+      grid-template-columns: 240px minmax(0, 1fr);
+      gap: 56px;
+      padding: 0 40px 120px;
+    }
+  }
+
+  /* ---------- cover ---------- */
+
+  .cover {
+    grid-column: 1 / -1;
+    padding: 72px 0 40px;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 8px;
+  }
+
+  .cover .kicker {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--ink-400);
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .cover .kicker .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--red);
+    display: inline-block;
+  }
+
+  .cover h1 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: clamp(34px, 5vw, 54px);
+    line-height: 1.08;
+    letter-spacing: -0.01em;
+    margin: 18px 0 6px;
+    text-wrap: balance;
+    color: var(--ink-950);
+  }
+
+  .cover .subhead {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 19px;
+    color: var(--ink-600);
+    margin: 0 0 28px;
+    max-width: 62ch;
+  }
+
+  .cover .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 28px;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--ink-600);
+    padding-top: 22px;
+    border-top: 1px solid var(--rule);
+  }
+
+  .cover .meta-row strong {
+    display: block;
+    font-family: var(--body);
+    font-size: 13px;
+    color: var(--ink-950);
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+
+  /* ---------- nav rail ---------- */
+
+  nav.rail {
+    display: none;
+  }
+
+  @media (min-width: 980px) {
+    nav.rail {
+      display: block;
+      position: sticky;
+      top: 32px;
+      align-self: start;
+      padding-top: 40px;
+      max-height: calc(100vh - 64px);
+      overflow-y: auto;
+    }
+  }
+
+  nav.rail .rail-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-400);
+    margin-bottom: 14px;
+  }
+
+  nav.rail ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-left: 1px solid var(--rule);
+  }
+
+  nav.rail li { margin: 0; }
+
+  nav.rail a {
+    display: block;
+    padding: 7px 0 7px 16px;
+    margin-left: -1px;
+    border-left: 1px solid transparent;
+    font-size: 13.5px;
+    color: var(--ink-600);
+    text-decoration: none;
+    line-height: 1.35;
+  }
+
+  nav.rail a:hover { color: var(--ink-950); border-left-color: var(--ink-400); }
+
+  nav.rail .num {
+    font-family: var(--mono);
+    color: var(--ink-400);
+    margin-right: 8px;
+    font-size: 12px;
+  }
+
+  /* ---------- main content ---------- */
+
+  main { min-width: 0; padding-top: 40px; }
+
+  section { margin-bottom: 64px; scroll-margin-top: 24px; }
+
+  section > h2 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 27px;
+    color: var(--ink-950);
+    margin: 0 0 6px;
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  section > h2 .idx {
+    font-family: var(--mono);
+    font-size: 15px;
+    color: var(--red);
+    font-weight: 500;
+  }
+
+  section > .lede {
+    color: var(--ink-600);
+    max-width: 68ch;
+    margin: 0 0 28px;
+    font-size: 15.5px;
+  }
+
+  h3 {
+    font-family: var(--body);
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--ink-950);
+    margin: 28px 0 10px;
+  }
+
+  p { max-width: 68ch; margin: 0 0 14px; }
+  p.tight { max-width: 68ch; }
+
+  .prose ul, .prose ol { max-width: 66ch; padding-left: 22px; margin: 0 0 14px; }
+  .prose li { margin-bottom: 6px; }
+
+  code.inline {
+    font-family: var(--mono);
+    font-size: 0.88em;
+    background: var(--ink-100);
+    color: var(--ink-800);
+    padding: 0.1em 0.4em;
+    border-radius: 4px;
+  }
+
+  /* ---------- phase cards ---------- */
+
+  .phase-card {
+    background: var(--paper-raised);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    padding: 22px 24px;
+    margin-bottom: 18px;
+  }
+
+  .phase-card .phase-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 10px;
+  }
+
+  .phase-card h4 {
+    font-family: var(--body);
+    font-size: 15.5px;
+    font-weight: 700;
+    color: var(--ink-950);
+    margin: 0;
+  }
+
+  .status-chip {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    padding: 3px 9px;
+    border-radius: 100px;
+    white-space: nowrap;
+    border: 1px solid transparent;
+  }
+
+  .status-chip.done { background: var(--blue-ground); color: var(--blue-ink); border-color: color-mix(in srgb, var(--blue) 30%, transparent); }
+  .status-chip.partial { background: var(--red-ground); color: var(--red-ink); border-color: color-mix(in srgb, var(--red) 30%, transparent); }
+
+  .phase-card p { font-size: 14.5px; color: var(--ink-600); margin-bottom: 8px; }
+  .phase-card ul { margin: 8px 0 0; padding-left: 18px; font-size: 14px; color: var(--ink-600); }
+  .phase-card li { margin-bottom: 4px; }
+
+  /* ---------- bug callouts ---------- */
+
+  .incident {
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--red);
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin: 0 0 16px;
+    background: var(--paper-raised);
+  }
+
+  .incident .incident-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .incident .tag {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--red);
+    background: var(--red-ground);
+    border-radius: 4px;
+    padding: 2px 7px;
+  }
+
+  .incident h4 {
+    font-family: var(--body);
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0;
+    color: var(--ink-950);
+  }
+
+  .incident p { font-size: 14.5px; margin-bottom: 8px; color: var(--ink-600); max-width: none; }
+  .incident p strong { color: var(--ink-950); }
+
+  .verified {
+    border-left-color: var(--blue);
+  }
+  .verified .tag { color: var(--blue); background: var(--blue-ground); }
+
+  /* ---------- terminal blocks ---------- */
+
+  .term {
+    background: var(--mono-ground);
+    color: var(--mono-ink);
+    border-radius: 8px;
+    padding: 14px 16px;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 12.8px;
+    line-height: 1.55;
+    margin: 10px 0 16px;
+  }
+
+  .term .ok { color: #8ee6a8; }
+  .term .err { color: var(--mono-accent, #ff8a80); }
+  .term .muted { color: #8a8a90; }
+  .term .hi { color: var(--mono-accent-2, #7ea6ff); }
+
+  /* ---------- tables ---------- */
+
+  .table-wrap { overflow-x: auto; margin: 10px 0 20px; }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 520px;
+    font-size: 14px;
+  }
+
+  th {
+    text-align: left;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--ink-400);
+    padding: 8px 14px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--rule);
+    color: var(--ink-800);
+    font-variant-numeric: tabular-nums;
+  }
+
+  td.mono, th.mono { font-family: var(--mono); font-size: 12.5px; }
+
+  .pill {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  .pill.live { background: var(--blue-ground); color: var(--blue-ink); }
+  .pill.pending { background: var(--ink-100); color: var(--ink-600); }
+
+  /* ---------- pdf preview ---------- */
+
+  .pdf-frame {
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    padding: 28px 30px;
+    background: var(--paper-raised);
+    max-width: 560px;
+    font-family: var(--body);
+  }
+  .pdf-frame .pf-title { font-family: var(--display); font-weight: 700; font-size: 21px; color: var(--red); margin: 0; }
+  .pdf-frame .pf-sub { color: var(--blue); font-size: 14px; margin: 4px 0 14px; }
+  .pdf-frame .pf-meta { font-size: 11.5px; color: var(--ink-400); margin-bottom: 16px; line-height: 1.7; }
+  .pdf-frame h5 { font-size: 13px; border-bottom: 2px solid var(--red); padding-bottom: 4px; margin: 16px 0 8px; color: var(--ink-950); }
+  .pdf-frame table { font-size: 11.5px; min-width: 0; }
+  .pdf-frame th { background: var(--ink-950); color: var(--paper); font-family: var(--body); text-transform: none; letter-spacing: 0; font-size: 11px; }
+  :root[data-theme="dark"] .pdf-frame th { background: var(--ink-100); color: var(--ink-950); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .pdf-frame th { background: var(--ink-100); color: var(--ink-950); } }
+
+  /* ---------- footer ---------- */
+
+  footer {
+    grid-column: 1 / -1;
+    border-top: 1px solid var(--rule);
+    padding-top: 22px;
+    margin-top: 24px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-400);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .divider { height: 1px; background: var(--rule); margin: 40px 0; border: none; }
+</style>
+
+<div class="shell">
+
+  <div class="cover">
+    <div class="kicker"><span class="dot"></span>AegisPen — Journal de Développement</div>
+    <h1>De l'amplification du plan de travail à une plateforme fonctionnelle en conteneurs</h1>
+    <p class="subhead">Compte-rendu intégral de la session : les huit phases construites, les bugs réels découverts en testant contre une vraie stack Docker plutôt que supposés corrects, et l'état actuel du système en fonctionnement.</p>
+    <div class="meta-row">
+      <div><strong>Projet</strong>AegisPen — PFE Refa</div>
+      <div><strong>Portée</strong>Backend FastAPI + Frontend React + Docker Compose</div>
+      <div><strong>Résultat</strong>49 tests automatisés, vérification bout-en-bout réelle</div>
+      <div><strong>Environnement</strong>Windows, Docker Desktop, connexion réseau instable</div>
+    </div>
+  </div>
+
+  <nav class="rail">
+    <div class="rail-title">Sommaire</div>
+    <ol>
+      <li><a href="#origine"><span class="num">00</span>Origine de la demande</a></li>
+      <li><a href="#phase0"><span class="num">01</span>Fondations Docker</a></li>
+      <li><a href="#phase1"><span class="num">02</span>Modèle de données</a></li>
+      <li><a href="#phase3"><span class="num">03</span>Moteur de risque</a></li>
+      <li><a href="#phase2"><span class="num">04</span>API et authentification</a></li>
+      <li><a href="#phase6"><span class="num">05</span>Rapport PDF</a></li>
+      <li><a href="#phase45"><span class="num">06</span>Adaptateurs AD &amp; Web</a></li>
+      <li><a href="#frontend"><span class="num">07</span>Frontend React</a></li>
+      <li><a href="#docker"><span class="num">08</span>Vérification Docker réelle</a></li>
+      <li><a href="#bugs"><span class="num">09</span>Bugs trouvés et corrigés</a></li>
+      <li><a href="#outillage"><span class="num">10</span>Installation des outils</a></li>
+      <li><a href="#etat"><span class="num">11</span>État actuel</a></li>
+    </ol>
+  </nav>
+
+  <main class="prose">
+
+    <section id="origine">
+      <h2><span class="idx">00</span>Origine de la demande</h2>
+      <p class="lede">Deux temps distincts : d'abord amplifier un document de planification, ensuite le construire réellement.</p>
+      <p>La session a commencé par une demande d'amplification du fichier <code class="inline">Plan_de_Travail_AegisPen.md</code>, un plan de travail de PFE déjà structuré en 7 sections. Cette première passe a ajouté une formule de scoring de risque détaillée, un modèle de données PostgreSQL, une spécification API REST, un schéma JSON pour les adaptateurs d'outils, un diagramme de machine à états, une section sécurité de la plateforme elle-même, un planning détaillé par sprint et un registre de risques projet — faisant passer le document de 127 à environ 500 lignes.</p>
+      <p>Une tentative de transmettre ce plan à un outil de raffinement distant (Ultraplan) a échoué faute de dépôt Git initialisé — l'occasion de créer le premier commit du projet. Ensuite est venue la demande explicite : construire réellement la plateforme, phase par phase, sans s'arrêter, avec trois contraintes fermes — aucun emoji nulle part, du code sans ton IA, et une palette strictement rouge / bleu / noir pour le frontend.</p>
+    </section>
+
+    <section id="phase0">
+      <h2><span class="idx">01</span>Fondations Docker</h2>
+      <p class="lede">Structure du dépôt, orchestration Docker Compose, documentation du laboratoire.</p>
+      <div class="phase-card">
+        <div class="phase-head"><h4>Phase 0 — Fondations &amp; documentation du lab</h4><span class="status-chip done">terminé</span></div>
+        <p><code class="inline">docker-compose.yml</code> pour postgres, redis, backend, worker et frontend ; <code class="inline">docs/LAB_SETUP.md</code> avec les instructions précises pour monter GOAD-Light et OWASP Juice Shop en isolation réseau — volontairement laissé à la charge de l'utilisateur, puisque personne d'autre ne doit contrôler un environnement capable de lancer des attaques Active Directory.</p>
+      </div>
+    </section>
+
+    <section id="phase1">
+      <h2><span class="idx">02</span>Modèle de données &amp; adaptateurs de reconnaissance</h2>
+      <p class="lede">Huit tables SQLAlchemy, une migration Alembic, et les trois premiers adaptateurs d'outils.</p>
+      <div class="phase-card">
+        <div class="phase-head"><h4>Phase 1 — Backend skeleton, modèles, adaptateurs recon</h4><span class="status-chip done">terminé</span></div>
+        <ul>
+          <li>Modèles <code class="inline">engagements</code>, <code class="inline">targets</code>, <code class="inline">actions</code>, <code class="inline">approvals</code>, <code class="inline">evidence</code>, <code class="inline">findings</code>, <code class="inline">audit_log</code>, <code class="inline">reports</code></li>
+          <li><code class="inline">adapters/base.py</code> : contrat commun entrée/sortie JSON pour tout adaptateur d'outil</li>
+          <li>Adaptateurs Nmap, ffuf, Nuclei — wrappers <code class="inline">subprocess</code> réels, jamais de simulation de résultat</li>
+          <li>Migration Alembic générée et appliquée contre un vrai PostgreSQL, pas une base fictive</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="phase3">
+      <h2><span class="idx">03</span>Moteur de risque, machine à états, audit</h2>
+      <p class="lede">Le cœur du positionnement d'AegisPen : transformer une formule de risque en décision automatique traçable.</p>
+      <div class="phase-card">
+        <div class="phase-head"><h4>Phase 3 — Moteur de risque et porte d'approbation</h4><span class="status-chip done">terminé</span></div>
+        <p>Formule <code class="inline">Score = Impact × Détectabilité / Réversibilité</code>, testée contre les six exemples chiffrés du plan de travail. Une règle dure force le tier <em>Interdit</em> dès que la réversibilité vaut 1, indépendamment du score — c'est ce qui bloque DCSync même si son score numérique reste inférieur au seuil.</p>
+        <p>Le journal d'audit chaîne chaque entrée par hash SHA-256 sur l'entrée précédente : modifier une ligne passée casse la chaîne, ce qui est vérifié par un test dédié qui altère volontairement une entrée et confirme que la vérification échoue.</p>
+      </div>
+    </section>
+
+    <section id="phase2">
+      <h2><span class="idx">04</span>API REST, authentification, orchestration Celery</h2>
+      <p class="lede">FastAPI, JWT, RBAC pentester/reader, et l'exécution asynchrone des adaptateurs.</p>
+      <div class="phase-card">
+        <div class="phase-head"><h4>Phase 2 — Endpoints, workers, câblage</h4><span class="status-chip done">terminé</span></div>
+        <p>Les routers <code class="inline">/engagements</code>, <code class="inline">/actions</code>, <code class="inline">/approvals</code>, <code class="inline">/findings</code>, <code class="inline">/reports</code> et <code class="inline">/auth</code> sont posés sur le moteur de risque : une action <em>automatique</em> part immédiatement en tâche Celery, une action <em>approbation</em> met l'engagement en pause à <code class="inline">approval_pending</code>, une action <em>interdite</em> est enregistrée comme bloquée sans jamais toucher au statut de l'engagement.</p>
+        <p>Authentification par bcrypt direct (passlib s'est révélé incompatible avec bcrypt 5.x, voir <a href="#bugs">bugs</a>), pas d'endpoint d'inscription publique — les comptes se créent uniquement via un script shell côté serveur.</p>
+      </div>
+    </section>
+
+    <section id="phase6">
+      <h2><span class="idx">05</span>Génération de rapport PDF</h2>
+      <p class="lede">Un template Jinja2 rendu en PDF par WeasyPrint, alimenté par les données réelles d'un engagement.</p>
+      <div class="phase-card">
+        <div class="phase-head"><h4>Phase 6 — Moteur de reporting</h4><span class="status-chip done">terminé, vérifié avec un vrai PDF</span></div>
+        <p>Le rapport rassemble les cibles, les vulnérabilités, les actions exécutées et le journal d'audit complet d'un engagement. La palette rouge/bleu/noir du frontend est reprise dans le PDF pour la cohérence visuelle du livrable client.</p>
+      </div>
+
+      <h3>Aperçu du rapport généré</h3>
+      <p>Reconstruction fidèle du PDF réellement produit lors de la vérification finale contre l'engagement <code class="inline">Full Verification Engagement</code> — cible <code class="inline">10.10.10.5</code>, statut <code class="inline">exploitation</code>.</p>
+      <div class="pdf-frame">
+        <p class="pf-title">AegisPen - Rapport d'Audit</p>
+        <p class="pf-sub">Full Verification Engagement</p>
+        <p class="pf-meta">Statut de l'engagement : exploitation<br>Portée validée : oui<br>Généré le : 2026-07-30T00:37:12Z</p>
+        <h5>Cibles</h5>
+        <table><tr><th>Hôte</th><th>Type</th></tr><tr><td>10.10.10.5</td><td>web</td></tr></table>
+        <h5>Actions Exécutées</h5>
+        <table><tr><th>Outil</th><th>Tier</th><th>Score</th><th>Statut</th></tr>
+          <tr><td>nmap</td><td>automatic</td><td>0.40</td><td>completed</td></tr>
+          <tr><td>sqlmap</td><td>approval</td><td>3.00</td><td>failed</td></tr>
+        </table>
+        <h5>Journal d'Audit</h5>
+        <table><tr><th>Acteur</th><th>Événement</th><th>Hash</th></tr>
+          <tr><td>pentester@aegispen.local</td><td>engagement_created</td><td>327a5281…</td></tr>
+          <tr><td>pentester@aegispen.local</td><td>action_submitted</td><td>9504106c…</td></tr>
+          <tr><td>system</td><td>action_executed</td><td>fb378d23…</td></tr>
+          <tr><td>pentester@aegispen.local</td><td>approval_decision</td><td>b971a46f…</td></tr>
+        </table>
+      </div>
+      <p style="margin-top:14px; font-size:13.5px; color:var(--ink-400);">Le statut <code class="inline">failed</code> sur sqlmap dans cette capture est correct et attendu : au moment de la génération, sqlmap n'était pas encore installé dans le conteneur — l'adaptateur a signalé une erreur structurée plutôt que de fabriquer un faux résultat, exactement comme prévu par la conception.</p>
+    </section>
+
+    <section id="phase45">
+      <h2><span class="idx">06</span>Adaptateurs Active Directory et Web approfondi</h2>
+      <p class="lede">NetExec, BloodHound, sqlmap et OWASP ZAP — chacun classé par le moteur de risque, jamais en tier automatique pour les scans actifs.</p>
+      <div class="phase-card">
+        <div class="phase-head"><h4>Phase 4 — Module Active Directory</h4><span class="status-chip done">terminé</span></div>
+        <p>Adaptateur NetExec pour le Kerberoasting et l'AS-REP Roasting, adaptateur BloodHound pour la collecte LDAP/SMB avec extraction du nombre d'objets collectés depuis l'archive ZIP produite par le collecteur.</p>
+      </div>
+      <div class="phase-card">
+        <div class="phase-head"><h4>Phase 5 — Module Web approfondi</h4><span class="status-chip done">terminé</span></div>
+        <p>Adaptateurs sqlmap et ZAP, tous deux épinglés au tier <em>approbation</em> dans le catalogue de risque quel que soit leur score numérique — conformément à la règle du plan de travail selon laquelle un scan actif ne doit jamais s'exécuter sans décision humaine explicite.</p>
+      </div>
+    </section>
+
+    <section id="frontend">
+      <h2><span class="idx">07</span>Frontend React</h2>
+      <p class="lede">Dashboard, porte d'approbation, palette stricte — sans une seule autre couleur d'accent que le rouge et le bleu.</p>
+      <p>React + TypeScript + Tailwind, avec une configuration Tailwind qui remplace entièrement la palette par défaut : seules trois familles existent — <code class="inline">red</code>, <code class="inline">blue</code>, <code class="inline">ink</code> (noir/gris neutre). Aucune couleur verte, jaune ou violette n'est disponible dans le système de design, donc aucune ne peut apparaître par erreur.</p>
+      <p>La page centrale, <code class="inline">EngagementDetail</code>, affiche le fil des actions en direct (rafraîchi toutes les quatre secondes), et fait apparaître la <code class="inline">ApprovalPanel</code> — la porte d'approbation avec ses deux options A/B et sa justification obligatoire — dès qu'une action passe en attente.</p>
+    </section>
+
+    <hr class="divider" />
+
+    <section id="docker">
+      <h2><span class="idx">08</span>Vérification Docker réelle</h2>
+      <p class="lede">La partie la plus longue de la session : prouver que la plateforme fonctionne vraiment, pas seulement que ses tests unitaires passent.</p>
+      <p>Après les cinq premiers commits (Phases 0 à 6), la totalité de la stack a été montée via <code class="inline">docker compose up</code> et exercée de bout en bout : connexion, création d'un engagement avec validation de portée obligatoire, soumission d'une action automatique (nmap, exécuté réellement dans le conteneur Linux), soumission d'une action d'approbation (sqlmap), décision d'approbation avec justification, blocage d'une action interdite (DCSync) sans effet sur le statut de l'engagement, et génération d'un rapport PDF réel.</p>
+
+      <div class="term"><span class="muted">$</span> curl -s http://localhost:8002/actions/979b4e89... -H "Authorization: Bearer ..."
+<span class="ok">{"tool":"nmap","tier":"automatic","status":"completed",
+ "result":{"status":"success","evidence":["/data/evidence/.../nmap-3a777d19.out"]}}</span>
+
+<span class="muted">$</span> curl -s -X POST http://localhost:8002/reports/f45cda4f... -H "Authorization: Bearer ..."
+<span class="ok">{"pdf_ref":"/data/evidence/.../reports/report-cb272ae1.pdf"}</span>  HTTP=201
+
+<span class="muted">$</span> head -c 8 report-cb272ae1.pdf
+<span class="ok">%PDF-1.7</span></div>
+
+      <p>Cette vérification a exigé de résoudre une série de problèmes d'infrastructure réels, documentés ci-dessous, avant d'obtenir un système entièrement fonctionnel.</p>
+
+      <h3>Le fil des incidents d'infrastructure</h3>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Problème</th><th>Cause</th><th>Résolution</th></tr>
+          <tr><td>Conflit de port 5432/6379/8000</td><td class="mono">Un processus tiers préexistant occupait ces ports sur la machine hôte</td><td>Ports Postgres/Redis retirés de l'exposition hôte par défaut (accès interne uniquement) ; ports backend/frontend rendus configurables par variable d'environnement</td></tr>
+          <tr><td>Fusion de <code class="inline">docker-compose.override.yml</code></td><td class="mono">Docker Compose <em>ajoute</em> les listes <code class="inline">ports</code> entre fichiers plutôt que de les remplacer</td><td>Retiré la republication de port par défaut plutôt que de lutter contre le comportement de fusion</td></tr>
+          <tr><td>185 Mo de <code class="inline">.venv</code> uploadés à chaque build</td><td class="mono">Aucun fichier <code class="inline">.dockerignore</code> n'existait</td><td>Ajout de <code class="inline">.dockerignore</code> pour le backend et le frontend</td></tr>
+          <tr><td>Coupures réseau répétées</td><td class="mono">Connexion instable de cette machine vers Docker Hub / deb.debian.org / registry npm</td><td>Builds reconstruits par service isolé plutôt qu'en un seul <code class="inline">docker compose build</code>, pour que l'échec d'un service n'annule pas la progression des autres</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <section id="bugs">
+      <h2><span class="idx">09</span>Bugs réels trouvés et corrigés</h2>
+      <p class="lede">Chacun de ces bugs n'est apparu qu'en testant contre la vraie stack — aucun n'aurait été détecté en relisant le code seul.</p>
+
+      <div class="incident">
+        <div class="incident-head"><span class="tag">Crash worker</span><h4>Action sans cible faisait planter Celery et restait bloquée pour toujours</h4></div>
+        <p><strong>Scénario</strong> : soumettre une action sans <code class="inline">target_id</code> ni <code class="inline">params.target</code> provoquait un <code class="inline">TypeError</code> non capturé au fond de <code class="inline">subprocess.run(None, ...)</code>, laissant l'action bloquée en statut <code class="inline">running</code> indéfiniment, sans trace d'erreur.</p>
+        <p><strong>Correction</strong> : validation à la création (rejet HTTP 400 si aucune cible n'est fournie), et un filet de sécurité dans <code class="inline">execute_action</code> qui garantit qu'aucune action ne peut plus rester bloquée dans un état non terminal, quelle que soit l'exception levée par un adaptateur.</p>
+      </div>
+
+      <div class="incident">
+        <div class="incident-head"><span class="tag">Dépendance</span><h4>Génération PDF cassée par une dépendance transitive non épinglée</h4></div>
+        <p><strong>Scénario</strong> : <code class="inline">weasyprint==62.3</code> était épinglé, mais pas <code class="inline">pydyf</code> (sa dépendance de génération PDF). pip a résolu <code class="inline">pydyf 0.12.1</code>, incompatible avec l'API attendue par weasyprint 62.3 — <code class="inline">AttributeError: 'super' object has no attribute 'transform'</code> sur chaque appel.</p>
+        <p><strong>Correction</strong> : mise à jour vers <code class="inline">weasyprint==69.0</code>, vérifiée en générant et inspectant un vrai PDF (en-tête <code class="inline">%PDF-1.7</code>, contenu exact) depuis un engagement réel.</p>
+      </div>
+
+      <div class="incident">
+        <div class="incident-head"><span class="tag">Image Docker</span><h4>Nom de paquet Debian obsolète</h4></div>
+        <p><code class="inline">libgdk-pixbuf2.0-0</code>, utilisé par le Dockerfile backend, n'existe plus sur Debian trixie (base actuelle de <code class="inline">python:3.11-slim</code>) — renommé en <code class="inline">libgdk-pixbuf-2.0-0</code>.</p>
+      </div>
+
+      <div class="incident">
+        <div class="incident-head"><span class="tag">Machine à états</span><h4>Transition manquante : reconnaissance → approval_pending</h4></div>
+        <p>Une action de tier <em>approbation</em> soumise directement depuis le statut <code class="inline">reconnaissance</code> (sans action automatique préalable) n'avait aucune transition valide vers <code class="inline">approval_pending</code> — l'engagement ne pouvait donc jamais se mettre en pause dans ce cas précis. Arête ajoutée à la machine à états.</p>
+      </div>
+
+      <div class="incident">
+        <div class="incident-head"><span class="tag">Parsing</span><h4>Extraction de compte Kerberoastable retournait une chaîne vide</h4></div>
+        <p><code class="inline">'*svc_sql'.split('*')[0]</code> retourne <code class="inline">''</code>, pas <code class="inline">'svc_sql'</code> — l'adaptateur NetExec récupérait donc un nom de compte vide sur chaque hash Kerberoast parsé. Corrigé en <code class="inline">.lstrip('*')</code>, prouvé par un test qui aurait échoué avec l'ancien code.</p>
+      </div>
+
+      <div class="incident">
+        <div class="incident-head"><span class="tag">Audit</span><h4>Le chemin « outil inconnu » sautait la journalisation d'audit</h4></div>
+        <p>Découvert en écrivant le test de non-régression lui-même : soumettre une action pour un outil non enregistré marquait l'action en échec mais retournait avant d'appeler <code class="inline">append_entry</code> — la seule sortie d'<code class="inline">execute_action</code> qui ne laissait aucune trace dans le journal d'audit.</p>
+      </div>
+
+      <div class="incident">
+        <div class="incident-head"><span class="tag">Bcrypt</span><h4>passlib incompatible avec bcrypt 5.x</h4></div>
+        <p>La routine d'auto-détection interne de passlib 1.7.4 plante sur <code class="inline">bcrypt≥4.1</code> (<code class="inline">password cannot be longer than 72 bytes</code>, un faux positif de sa détection de bug). Remplacé par des appels directs à la librairie <code class="inline">bcrypt</code>, contournant entièrement le bug.</p>
+      </div>
+    </section>
+
+    <section id="outillage">
+      <h2><span class="idx">10</span>Installation des outils dans le conteneur worker</h2>
+      <p class="lede">Chaque outil offensif doit réellement être présent dans le conteneur qui exécute les adaptateurs — sinon l'adaptateur le signale honnêtement plutôt que de simuler un résultat. Cette section a été le fil le plus long de l'après-rapport initial : l'utilisateur testait la plateforme en direct, action par action, et chaque outil manquant est apparu un par un.</p>
+
+      <div class="table-wrap">
+        <table>
+          <tr><th>Outil</th><th>Méthode</th><th class="mono">État</th></tr>
+          <tr><td>nmap</td><td>Paquet Debian (<code class="inline">apt</code>), dans le Dockerfile depuis le début</td><td><span class="pill live">actif</span></td></tr>
+          <tr><td>sqlmap</td><td>Paquet Debian (<code class="inline">apt</code>), demandé par l'utilisateur en testant l'approbation d'une action</td><td><span class="pill live">actif</span></td></tr>
+          <tr><td>ffuf</td><td>Paquet Debian (<code class="inline">apt</code>), demandé par l'utilisateur juste après</td><td><span class="pill live">actif</span></td></tr>
+          <tr><td>nuclei</td><td>Non empaqueté pour Debian — build multi-étage via <code class="inline">golang:1.23-bookworm</code> et <code class="inline">go install</code></td><td><span class="pill pending">en cours de build</span></td></tr>
+          <tr><td>netexec / bloodhound-python</td><td>Non encore ajoutés à l'image</td><td><span class="pill pending">à faire</span></td></tr>
+        </table>
+      </div>
+
+      <h3>Le découverte : backend et worker sont deux conteneurs distincts</h3>
+      <p>Premier réflexe en voyant l'erreur <code class="inline">required binary 'sqlmap' is not installed</code> : installer sqlmap dans le conteneur <code class="inline">backend</code>. Erreur — l'API et le worker Celery partagent la même image Docker mais tournent dans deux conteneurs séparés, et c'est le <strong>worker</strong> qui exécute réellement les adaptateurs via <code class="inline">subprocess</code>. L'installation dans <code class="inline">backend</code> n'avait donc aucun effet ; il a fallu la refaire dans <code class="inline">worker</code>.</p>
+
+      <div class="term"><span class="muted">$</span> docker compose exec -u root worker sh -c "apt-get update -qq && apt-get install -y sqlmap"
+<span class="ok">Setting up sqlmap (1.9.6-1) ...</span>
+
+<span class="muted">$</span> docker compose exec -u root worker sh -c "apt-get install -y ffuf"
+<span class="ok">Setting up ffuf (2.1.0-1+b9) ...</span></div>
+
+      <h3>nuclei : la limite réelle de cette connexion</h3>
+      <p>nuclei n'est pas empaqueté pour Debian (outil Go, distribué via <code class="inline">go install</code>). Une première tentative a installé <code class="inline">golang-go</code> par <code class="inline">apt</code> en direct dans le worker — abandonnée en cours de route car trop lente et redondante avec une approche plus propre déjà décidée : un <strong>build Docker multi-étage</strong>, avec une étape <code class="inline">FROM golang:1.23-bookworm</code> qui compile nuclei séparément, dont seul le binaire final est copié dans l'image de production Python. Cette approche évite de laisser toute la chaîne de compilation Go dans l'image finale.</p>
+      <p>Le premier build complet a échoué avec <code class="inline">short read: expected 64400050 bytes but got 53128318: unexpected EOF</code> — une coupure réseau en plein téléchargement de l'image <code class="inline">golang:1.23-bookworm</code>. Une deuxième tentative a été relancée ; au moment de la rédaction de cette mise à jour, elle est toujours en cours, avançant lentement (plusieurs centaines de secondes pour quelques dizaines de mégaoctets) mais sans être bloquée — juste au rythme de cette connexion.</p>
+
+      <div class="incident">
+        <div class="incident-head"><span class="tag">Build annulé</span><h4>Un build en cours devient obsolète dès que le Dockerfile change</h4></div>
+        <p>Après avoir lancé un premier rebuild pour sqlmap/ffuf, le Dockerfile a été modifié à nouveau (ajout de l'étape multi-stage nuclei) <em>pendant que ce premier build tournait encore</em>. Docker Buildkit lit le Dockerfile au moment du lancement, pas en continu — le build en cours restait donc basé sur l'ancienne version, sans nuclei. Plutôt que d'attendre inutilement sa fin puis relancer un second build complet, il a été interrompu et un unique build propre relancé avec le Dockerfile à jour.</p>
+      </div>
+    </section>
+
+    <section id="etat">
+      <h2><span class="idx">11</span>État actuel du système</h2>
+      <p class="lede">Ce qui tourne, comment y accéder, ce qui reste en suspens.</p>
+
+      <div class="table-wrap">
+        <table>
+          <tr><th>Service</th><th>Accès</th><th class="mono">État</th></tr>
+          <tr><td>Frontend</td><td class="mono">http://localhost:5174</td><td><span class="pill live">actif</span></td></tr>
+          <tr><td>API backend</td><td class="mono">http://localhost:8002/docs</td><td><span class="pill live">actif</span></td></tr>
+          <tr><td>PostgreSQL</td><td class="mono">interne uniquement (réseau Docker)</td><td><span class="pill live">actif</span></td></tr>
+          <tr><td>Redis / Celery worker</td><td class="mono">interne uniquement (réseau Docker)</td><td><span class="pill live">actif</span></td></tr>
+        </table>
+      </div>
+
+      <div class="incident verified">
+        <div class="incident-head"><span class="tag">Limite connue</span><h4>Image Docker du frontend jamais construite avec succès</h4></div>
+        <p>L'installation <code class="inline">npm ci</code> dans le Dockerfile du frontend a échoué deux fois pour des raisons purement réseau (<code class="inline">ECONNRESET</code> après 70 secondes de téléchargement, malgré une configuration de retry npm ajoutée). Le frontend reste entièrement vérifié — build TypeScript propre, <code class="inline">npm run dev</code> fonctionnel, CORS testé en direct contre le backend conteneurisé — mais tourne actuellement via le serveur de développement Vite plutôt que dans son propre conteneur.</p>
+      </div>
+
+      <div class="incident">
+        <div class="incident-head"><span class="tag">En cours</span><h4>Build nuclei toujours en vol</h4></div>
+        <p>Au moment de cette mise à jour, le build multi-étage de nuclei tourne toujours en arrière-plan, ralenti par la même connexion instable. <code class="inline">nmap</code>, <code class="inline">sqlmap</code> et <code class="inline">ffuf</code> sont d'ores et déjà actifs dans le conteneur worker en cours d'exécution et utilisables immédiatement — seul <code class="inline">nuclei</code> reste indisponible en attendant la fin de ce build.</p>
+      </div>
+
+      <p>49 tests automatisés côté backend passent sur une base de données propre, couvrant le moteur de risque, la machine à états, le chaînage du journal d'audit, les parseurs de chaque adaptateur, et le flux API complet incluant le contrôle d'accès par rôle.</p>
+    </section>
+
+  </main>
+
+  <footer>
+    <span>AegisPen — rapport généré à la fin de la session d'implémentation</span>
+    <span>Palette : rouge / bleu / noir, sans exception</span>
+  </footer>
+
+</div>

@@ -6,15 +6,18 @@ import { Badge, actionStatusTone, engagementStatusTone, riskTierTone, severityTo
 import { ApprovalPanel } from "../components/ApprovalPanel";
 
 const KNOWN_TOOLS = [
-  { tool: "nmap", profile: "syn-stealth", label: "nmap - scan de ports (automatique)" },
-  { tool: "ffuf", profile: "default", label: "ffuf - decouverte de repertoires (automatique)" },
-  { tool: "nuclei", profile: "default", label: "nuclei - templates par defaut (automatique)" },
-  { tool: "nuclei", profile: "aggressive", label: "nuclei - mode agressif (approbation)" },
-  { tool: "sqlmap", profile: "aggressive", label: "sqlmap - mode agressif (approbation)" },
-  { tool: "netexec", profile: "kerberoast", label: "netexec - kerberoasting (approbation)" },
-  { tool: "ad", profile: "bruteforce-massive", label: "brute-force massif AD (interdit)" },
-  { tool: "netexec", profile: "dcsync", label: "netexec - dcsync (interdit)" },
+  { tool: "nmap", profile: "syn-stealth", label: "nmap - scan de ports (automatique)", category: "Web" },
+  { tool: "ffuf", profile: "default", label: "ffuf - decouverte de repertoires (automatique)", category: "Web" },
+  { tool: "nuclei", profile: "default", label: "nuclei - templates par defaut (automatique)", category: "Web" },
+  { tool: "nuclei", profile: "aggressive", label: "nuclei - mode agressif (approbation)", category: "Web" },
+  { tool: "sqlmap", profile: "aggressive", label: "sqlmap - mode agressif (approbation)", category: "Web" },
+  { tool: "bloodhound", profile: "collect", label: "bloodhound - collecte LDAP/SMB (automatique)", category: "Active Directory" },
+  { tool: "netexec", profile: "kerberoast", label: "netexec - kerberoasting (approbation)", category: "Active Directory" },
+  { tool: "netexec", profile: "dcsync", label: "netexec - dcsync (interdit)", category: "Active Directory" },
+  { tool: "ad", profile: "bruteforce-massive", label: "brute-force massif AD (interdit)", category: "Active Directory" },
 ];
+
+const TOOL_CATEGORIES = ["Web", "Active Directory"] as const;
 
 export function EngagementDetail() {
   const { engagementId } = useParams<{ engagementId: string }>();
@@ -136,10 +139,16 @@ export function EngagementDetail() {
               onChange={(e) => setSelectedToolIndex(Number(e.target.value))}
               className="rounded border border-ink-600 bg-ink-900 px-3 py-2 text-ink-50 outline-none focus:border-blue-600"
             >
-              {KNOWN_TOOLS.map((choice, index) => (
-                <option key={`${choice.tool}-${choice.profile}`} value={index}>
-                  {choice.label}
-                </option>
+              {TOOL_CATEGORIES.map((category) => (
+                <optgroup key={category} label={category}>
+                  {KNOWN_TOOLS.map((choice, index) =>
+                    choice.category === category ? (
+                      <option key={`${choice.tool}-${choice.profile}`} value={index}>
+                        {choice.label}
+                      </option>
+                    ) : null
+                  )}
+                </optgroup>
               ))}
             </select>
           </div>

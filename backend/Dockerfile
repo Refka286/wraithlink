@@ -1,7 +1,14 @@
+FROM golang:1.25-bookworm AS nuclei-builder
+RUN go install github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
+
 FROM python:3.11-slim
+
+COPY --from=nuclei-builder /go/bin/nuclei /usr/local/bin/nuclei
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     nmap \
+    sqlmap \
+    ffuf \
     build-essential \
     libpango-1.0-0 \
     libpangocairo-1.0-0 \
