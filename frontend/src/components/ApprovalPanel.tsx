@@ -26,11 +26,12 @@ export function ApprovalPanel({ action, onDecided }: { action: Action; onDecided
   }
 
   return (
-    <section className="rounded border-2 border-red-700 bg-black p-6">
-      <h2 className="mb-1 text-lg font-semibold text-red-500">Porte d'approbation</h2>
+    <section className="rounded-card border-2 border-red-700 bg-card p-6">
+      <span className="eyebrow !text-red-400">Point de decision sensible</span>
+      <h2 className="mb-1 text-lg font-semibold text-red-400">Porte d'approbation</h2>
       <p className="mb-4 text-sm text-ink-400">
         Action <span className="font-medium text-ink-100">{action.tool}</span> classee en tier{" "}
-        <span className="font-medium text-red-500">{action.tier}</span> (score{" "}
+        <span className="font-medium text-red-400">{action.tier}</span> (score{" "}
         {action.risk_score?.toFixed(2)}). Une decision humaine explicite est requise avant execution.
       </p>
 
@@ -38,11 +39,11 @@ export function ApprovalPanel({ action, onDecided }: { action: Action; onDecided
         <button
           type="button"
           onClick={() => setOption("A")}
-          className={`rounded border p-4 text-left ${
-            option === "A" ? "border-blue-500 bg-blue-900/20" : "border-ink-600 hover:border-blue-700"
+          className={`rounded-card border p-4 text-left transition-colors ${
+            option === "A" ? "border-accent2 bg-accent2/10" : "border-hairline hover:border-accent2"
           }`}
         >
-          <p className="font-medium text-blue-400">Option A - Conservatrice</p>
+          <p className="font-medium text-accent2">Option A - Conservatrice</p>
           <p className="mt-1 text-xs text-ink-400">
             Execution limitee, moins de trafic, priorite a la discretion. Reduit le risque operationnel
             au prix d'une couverture plus faible.
@@ -51,8 +52,8 @@ export function ApprovalPanel({ action, onDecided }: { action: Action; onDecided
         <button
           type="button"
           onClick={() => setOption("B")}
-          className={`rounded border p-4 text-left ${
-            option === "B" ? "border-red-500 bg-red-900/20" : "border-ink-600 hover:border-red-700"
+          className={`rounded-card border p-4 text-left transition-colors ${
+            option === "B" ? "border-red-500 bg-red-900/20" : "border-hairline hover:border-red-700"
           }`}
         >
           <p className="font-medium text-red-400">Option B - Agressive</p>
@@ -68,16 +69,12 @@ export function ApprovalPanel({ action, onDecided }: { action: Action; onDecided
         value={justification}
         onChange={(e) => setJustification(e.target.value)}
         rows={3}
-        className="w-full rounded border border-ink-600 bg-ink-900 px-3 py-2 text-ink-50 outline-none focus:border-red-600"
+        className="field"
       />
 
       {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
 
-      <button
-        onClick={handleDecide}
-        disabled={submitting}
-        className="mt-4 rounded bg-red-700 px-4 py-2 font-medium text-white hover:bg-red-600 disabled:opacity-50"
-      >
+      <button onClick={handleDecide} disabled={submitting} className="btn-danger mt-4">
         {submitting ? "validation..." : "valider la decision"}
       </button>
     </section>

@@ -201,6 +201,20 @@ def test_submit_action_without_any_target_is_rejected(client, auth_headers):
     assert response.status_code == 400
 
 
+def test_create_engagement_trims_target_host_whitespace(client, auth_headers):
+    response = client.post(
+        "/engagements",
+        json={
+            "name": "Whitespace Engagement",
+            "scope_validated": True,
+            "targets": [{"host": "  10.10.10.9  ", "type": "web"}],
+        },
+        headers=auth_headers,
+    )
+    assert response.status_code == 201
+    assert response.json()["targets"][0]["host"] == "10.10.10.9"
+
+
 def test_submit_action_with_target_id_does_not_require_params_target(client, auth_headers):
     engagement = client.post(
         "/engagements",

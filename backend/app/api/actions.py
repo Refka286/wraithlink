@@ -6,9 +6,9 @@ from sqlalchemy.orm import Session
 
 from app.audit.log import append_entry
 from app.auth.deps import require_role
+from app.auth.scoping import get_authorized_engagement
 from app.database import get_db
 from app.models.action import Action
-from app.models.engagement import Engagement
 from app.models.enums import ActionStatus, RiskTier, UserRole
 from app.models.user import User
 from app.risk_engine.engine import classify_action
@@ -34,11 +34,9 @@ DEFAULT_PROFILES = {
 def submit_action(
     payload: ActionCreate,
     db: Session = Depends(get_db),
-    user: User = Depends(require_role(UserRole.pentester)),
+    user: User = Depends(require_role(UserRole.admin, UserRole.pentester)),
 ):
-    engagement = db.get(Engagement, payload.engagement_id)
-    if engagement is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="engagement not found")
+    engagement = get_authorized_engagement(db, payload.engagement_id, user)
 
     if payload.target_id is None and "target" not in payload.params:
         raise HTTPException(
@@ -101,8 +99,9 @@ def submit_action(
 def list_actions(
     engagement_id: uuid.UUID,
     db: Session = Depends(get_db),
-    user: User = Depends(require_role(UserRole.pentester, UserRole.reader)),
+    user: User = Depends(require_role(UserRole.admin, UserRole.pentester, UserRole.reader)),
 ):
+    get_authorized_engagement(db, engagement_id, user)
     return (
         db.execute(
             select(Action).where(Action.engagement_id == engagement_id).order_by(Action.created_at.desc())
@@ -116,9 +115,10 @@ def list_actions(
 def get_action(
     action_id: uuid.UUID,
     db: Session = Depends(get_db),
-    user: User = Depends(require_role(UserRole.pentester, UserRole.reader)),
+    user: User = Depends(require_role(UserRole.admin, UserRole.pentester, UserRole.reader)),
 ):
     action = db.get(Action, action_id)
     if action is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="action not found")
+    get_authorized_engagement(db, action.engagement_id, user)
     return action

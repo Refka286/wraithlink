@@ -1,6 +1,6 @@
 FROM node:20-alpine
 
-RUN addgroup -S aegispen && adduser -S aegispen -G aegispen
+RUN addgroup -S wraithlink && adduser -S wraithlink -G wraithlink
 
 WORKDIR /app
 
@@ -12,9 +12,9 @@ RUN npm config set fetch-retries 5 \
 
 COPY . .
 
-RUN chown -R aegispen:aegispen /app
+RUN chown -R wraithlink:wraithlink /app
 
-USER aegispen
+USER wraithlink
 
 EXPOSE 5173
 

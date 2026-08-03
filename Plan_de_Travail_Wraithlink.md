@@ -1,4 +1,4 @@
-# Plan de Travail : Projet AegisPen
+# Plan de Travail : Projet Wraithlink
 **Plateforme d'Orchestration Intelligente de Tests d'Intrusion Guidée par le Risque, pour Applications Web & Active Directory**
 
 *Projet de Fin d'Études (PFE) / Capstone Project — Cybersécurité Offensive & Ingénierie Logicielle*
@@ -29,23 +29,23 @@
 ## 1. Résumé Exécutif & Problématique
 
 ### 1.1 Présentation du Projet
-**AegisPen** est une plateforme d'orchestration et d'automatisation des tests d'intrusion (pentest) ciblant les applications Web et les environnements Active Directory (AD). Son objectif principal est d'automatiser les tâches répétitives et à faible risque (reconnaissance, énumération, découverte initiale de vulnérabilités) tout en conservant une supervision humaine stricte (« *Human-in-the-Loop* ») pour toute action présentant un risque opérationnel. AegisPen ne cherche pas à remplacer le pentesteur, mais à le libérer des tâches mécaniques pour qu'il concentre son expertise sur l'analyse, la décision et l'exploitation contrôlée.
+**Wraithlink** est une plateforme d'orchestration et d'automatisation des tests d'intrusion (pentest) ciblant les applications Web et les environnements Active Directory (AD). Son objectif principal est d'automatiser les tâches répétitives et à faible risque (reconnaissance, énumération, découverte initiale de vulnérabilités) tout en conservant une supervision humaine stricte (« *Human-in-the-Loop* ») pour toute action présentant un risque opérationnel. Wraithlink ne cherche pas à remplacer le pentesteur, mais à le libérer des tâches mécaniques pour qu'il concentre son expertise sur l'analyse, la décision et l'exploitation contrôlée.
 
 ### 1.2 Problématique
 * **Lenteur des tests manuels :** Une part significative d'un engagement de pentest (souvent estimée à 30-40 % du temps facturé) est consacrée à des tâches mécaniques et répétitives — scans de ports, énumération de sous-domaines, recherche de fichiers/répertoires, identification de comptes Kerberoastables — qui n'exigent pas de jugement expert mais absorbent un temps précieux.
 * **Limites des outils d'IA totalement autonomes :** L'automatisation non supervisée présente de graves risques opérationnels (crashs de systèmes en production, altération irréversible de données, verrouillages de comptes en masse) et souffre d'un déficit de confiance structurel de la part des entreprises clientes et des RSSI, qui refusent souvent catégoriquement de laisser un agent agir sans contrôle.
 * **Le vide entre ces deux extrêmes :** Il existe aujourd'hui peu d'outils qui formalisent explicitement *où* placer le curseur entre automatisation et supervision humaine, avec une méthode reproductible plutôt qu'une confiance aveugle envers un opérateur ou un algorithme.
-* **Positionnement d'AegisPen :** Trouver le juste milieu en automatisant ce qui est sûr, mesurable et réversible, et en imposant une prise de décision humaine explicite — assortie de deux options motivées (conservatrice vs. agressive) — dès que le niveau de risque calculé dépasse un seuil défini.
+* **Positionnement d'Wraithlink :** Trouver le juste milieu en automatisant ce qui est sûr, mesurable et réversible, et en imposant une prise de décision humaine explicite — assortie de deux options motivées (conservatrice vs. agressive) — dès que le niveau de risque calculé dépasse un seuil défini.
 
 ---
 
 ## 2. Vision & Facteurs de Différenciation
 
 ### 2.1 Vision
-Faire d'AegisPen une référence méthodologique autant qu'un outil : démontrer qu'il est possible de quantifier objectivement le risque d'une action offensive, et d'en faire un critère de décision auditable — plutôt qu'une intuition d'opérateur non tracée. À terme, la plateforme doit pouvoir servir de socle à des audits réels en environnement de laboratoire crédible, avec un niveau de rigueur et de traçabilité comparable aux exigences d'un livrable client professionnel.
+Faire d'Wraithlink une référence méthodologique autant qu'un outil : démontrer qu'il est possible de quantifier objectivement le risque d'une action offensive, et d'en faire un critère de décision auditable — plutôt qu'une intuition d'opérateur non tracée. À terme, la plateforme doit pouvoir servir de socle à des audits réels en environnement de laboratoire crédible, avec un niveau de rigueur et de traçabilité comparable aux exigences d'un livrable client professionnel.
 
 ### 2.2 Facteurs de Différenciation
-| Axe | Approche AegisPen | Alternative usuelle |
+| Axe | Approche Wraithlink | Alternative usuelle |
 | :--- | :--- | :--- |
 | **Prise de décision** | Score de risque quantifié + choix binaire argumenté (conservateur / agressif) | Décision manuelle non tracée, ou automatisation « tout ou rien » |
 | **Traçabilité** | Journal d'audit immuable (hash-chaining), preuve horodatée de chaque décision humaine | Logs applicatifs classiques, souvent altérables |
@@ -250,7 +250,7 @@ Une plateforme qui automatise des actions offensives doit elle-même respecter u
 
 ### 7.4 Durcissement du Déploiement
 * Conteneurs Docker exécutés en utilisateur non-root.
-* Réseau Docker dédié et isolé pour le lab cible, distinct du réseau applicatif d'AegisPen.
+* Réseau Docker dédié et isolé pour le lab cible, distinct du réseau applicatif d'Wraithlink.
 * Aucun secret injecté dans les images Docker (uniquement au runtime).
 * Principe du moindre privilège appliqué aux conteneurs exécutant les outils offensifs (capacités Linux restreintes, pas d'accès réseau hôte direct).
 

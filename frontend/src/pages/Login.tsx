@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import { ApiError } from "../api/client";
+import { ErrorBanner } from "../components/Feedback";
 
 export function Login() {
   const { login } = useAuth();
@@ -26,41 +27,48 @@ export function Login() {
   }
 
   return (
-    <div className="mx-auto mt-16 max-w-sm">
-      <div className="mb-8 text-center">
-        <span className="text-2xl font-bold text-red-600">Aegis</span>
-        <span className="text-2xl font-bold text-blue-500">Pen</span>
+    <div
+      className="flex min-h-screen items-center justify-center bg-night px-6"
+      style={{
+        backgroundImage:
+          "radial-gradient(circle at 20% 20%, rgba(79,124,255,0.18), transparent 45%), radial-gradient(circle at 80% 10%, rgba(46,230,214,0.15), transparent 40%)",
+      }}
+    >
+      <div className="w-full max-w-sm">
+        <div className="mb-8 text-center">
+          <span className="eyebrow">Acces plateforme</span>
+          <h1 className="text-3xl font-extrabold tracking-tight">
+            <span className="grad-text">Wraithlink</span>
+          </h1>
+        </div>
+        <form onSubmit={handleSubmit} className="panel space-y-4">
+          <div>
+            <label className="mb-1 block text-sm text-ink-300">Email</label>
+            <input
+              type="email"
+              required
+              placeholder="vous@exemple.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="field"
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-sm text-ink-300">Mot de passe</label>
+            <input
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="field"
+            />
+          </div>
+          {error && <ErrorBanner>{error}</ErrorBanner>}
+          <button type="submit" disabled={submitting} className="btn-primary w-full">
+            {submitting ? "connexion..." : "se connecter"}
+          </button>
+        </form>
       </div>
-      <form onSubmit={handleSubmit} className="space-y-4 rounded border border-ink-700 bg-black p-6">
-        <div>
-          <label className="mb-1 block text-sm text-ink-300">Email</label>
-          <input
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded border border-ink-600 bg-ink-900 px-3 py-2 text-ink-50 outline-none focus:border-blue-600"
-          />
-        </div>
-        <div>
-          <label className="mb-1 block text-sm text-ink-300">Mot de passe</label>
-          <input
-            type="password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded border border-ink-600 bg-ink-900 px-3 py-2 text-ink-50 outline-none focus:border-blue-600"
-          />
-        </div>
-        {error && <p className="text-sm text-red-500">{error}</p>}
-        <button
-          type="submit"
-          disabled={submitting}
-          className="w-full rounded bg-red-700 py-2 font-medium text-white hover:bg-red-600 disabled:opacity-50"
-        >
-          {submitting ? "connexion..." : "se connecter"}
-        </button>
-      </form>
     </div>
   );
 }

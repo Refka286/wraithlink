@@ -1,3 +1,5 @@
+import type { SuggestionsResponse } from "./types";
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
 
 export class ApiError extends Error {
@@ -10,14 +12,14 @@ export class ApiError extends Error {
 }
 
 function getToken(): string | null {
-  return localStorage.getItem("aegispen_token");
+  return localStorage.getItem("wraithlink_token");
 }
 
 export function setToken(token: string | null): void {
   if (token) {
-    localStorage.setItem("aegispen_token", token);
+    localStorage.setItem("wraithlink_token", token);
   } else {
-    localStorage.removeItem("aegispen_token");
+    localStorage.removeItem("wraithlink_token");
   }
 }
 
@@ -63,8 +65,47 @@ export async function login(email: string, password: string): Promise<string> {
   return data.access_token;
 }
 
+export async function getSuggestions(engagementId: string): Promise<SuggestionsResponse> {
+  return request<SuggestionsResponse>(`/suggestions/${engagementId}`, { method: "POST" });
+}
+
+async function downloadFile(path: string, filename: string): Promise<void> {
+  const token = getToken();
+  const headers = new Headers();
+  if (token) {
+    headers.set("Authorization", `Bearer ${token}`);
+  }
+
+  const response = await fetch(`${API_BASE_URL}${path}`, { headers });
+  if (!response.ok) {
+    throw new ApiError(response.status, response.statusText);
+  }
+
+  const blob = await response.blob();
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(url);
+}
+
+export async function downloadReport(reportId: string, filename: string): Promise<void> {
+  await downloadFile(`/reports/${reportId}/download`, filename);
+}
+
+export async function exportFindings(engagementId: string, format: "csv" | "json"): Promise<void> {
+  await downloadFile(
+    `/engagements/${engagementId}/findings/export?format=${format}`,
+    `findings-${engagementId}.${format}`
+  );
+}
+
 export const api = {
   get: <T>(path: string) => request<T>(path),
   post: <T>(path: string, body?: unknown) =>
     request<T>(path, { method: "POST", body: body !== undefined ? JSON.stringify(body) : undefined }),
+  delete: <T>(path: string) => request<T>(path, { method: "DELETE" }),
 };

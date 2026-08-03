@@ -67,7 +67,15 @@ def run_migrations_online() -> None:
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata
+            connection=connection,
+            target_metadata=target_metadata,
+            # Postgres refuses to use a newly-added enum value (see
+            # b2d4a9c1e853) inside the same transaction that added it.
+            # Alembic's default batches every pending revision applied by a
+            # single `upgrade` invocation into one transaction, which
+            # defeats splitting the enum-add into its own revision file -
+            # this commits after each revision instead.
+            transaction_per_migration=True,
         )
 
         with context.begin_transaction():

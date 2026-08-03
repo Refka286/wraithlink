@@ -42,10 +42,21 @@ export default {
         800: "#1e40af",
         900: "#1e3a8a",
       },
+      night: "#05070d",
+      surface: "#0b101c",
+      card: "#101828",
+      hairline: "rgba(255,255,255,0.08)",
+      accent: "#2ee6d6",
+      accent2: "#4f7cff",
+      success: "#34d399",
+      warning: "#f59e0b",
     },
     extend: {
       fontFamily: {
         sans: ["Inter", "Segoe UI", "Helvetica Neue", "Arial", "sans-serif"],
+      },
+      borderRadius: {
+        card: "14px",
       },
     },
   },

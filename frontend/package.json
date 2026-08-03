@@ -1,5 +1,5 @@
 {
-  "name": "aegispen-frontend",
+  "name": "wraithlink-frontend",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -10,9 +10,11 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
+    "lucide-react": "^1.28.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.26.2"
+    "react-router-dom": "^6.26.2",
+    "recharts": "^3.10.1"
   },
   "devDependencies": {
     "@types/react": "^18.3.5",

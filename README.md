@@ -1,8 +1,8 @@
-# AegisPen
+# Wraithlink
 
-Plateforme d'orchestration de tests d'intrusion guidee par le risque, pour applications Web et environnements Active Directory. Le plan de travail complet est dans [`Plan_de_Travail_AegisPen.md`](./Plan_de_Travail_AegisPen.md).
+Plateforme d'orchestration de tests d'intrusion guidee par le risque, pour applications Web et environnements Active Directory. Le plan de travail complet est dans [`Plan_de_Travail_Wraithlink.md`](./Plan_de_Travail_Wraithlink.md).
 
-AegisPen automatise la reconnaissance et l'enumeration a faible risque, et bloque toute execution devant un point de decision sensible tant qu'un pentesteur n'a pas explicitement choisi entre une option conservatrice et une option agressive. Chaque decision, chaque action et chaque preuve est tracee dans un journal d'audit chaine par hash.
+Wraithlink automatise la reconnaissance et l'enumeration a faible risque, et bloque toute execution devant un point de decision sensible tant qu'un pentesteur n'a pas explicitement choisi entre une option conservatrice et une option agressive. Chaque decision, chaque action et chaque preuve est tracee dans un journal d'audit chaine par hash.
 
 ## Architecture
 
@@ -41,7 +41,7 @@ Puis se connecter sur le frontend avec ces identifiants.
 
 ## Laboratoire
 
-AegisPen n'installe ni ne configure aucune cible. Voir [`docs/LAB_SETUP.md`](./docs/LAB_SETUP.md) pour monter GOAD-Light et OWASP Juice Shop dans un reseau isole avant de lancer le moindre engagement.
+Wraithlink n'installe ni ne configure aucune cible. Voir [`docs/LAB_SETUP.md`](./docs/LAB_SETUP.md) pour monter GOAD-Light et OWASP Juice Shop dans un reseau isole avant de lancer le moindre engagement.
 
 ## Developpement local
 

@@ -5,10 +5,12 @@ from app.adapters.base import AdapterInput
 from app.audit.log import append_entry
 from app.database import SessionLocal
 from app.models.action import Action
+from app.models.credential import Credential
 from app.models.enums import ActionStatus, FindingSeverity
 from app.models.evidence import Evidence
 from app.models.finding import Finding
 from app.models.target import Target
+from app.security.vault import decrypt_password
 from app.tasks.celery_app import celery_app
 
 
@@ -17,6 +19,30 @@ def _severity_from(raw: str | None) -> FindingSeverity:
         return FindingSeverity(raw)
     except ValueError:
         return FindingSeverity.info
+
+
+def _resolve_params(db: Session, params: dict) -> dict:
+    """
+    Build the params dict actually handed to the adapter. If the action
+    references a saved credential set by id, the decrypted username/
+    password/domain are merged into a COPY here - never written back onto
+    the Action row, so the plaintext password only ever exists in memory
+    for the duration of this one adapter call.
+    """
+    credential_id = params.get("credential_id")
+    if not credential_id:
+        return params
+
+    credential = db.get(Credential, credential_id)
+    if credential is None:
+        raise ValueError(f"no saved credential set found for id '{credential_id}'")
+
+    resolved = dict(params)
+    resolved["username"] = credential.username
+    resolved["password"] = decrypt_password(credential.encrypted_password)
+    if credential.domain:
+        resolved["domain"] = credential.domain
+    return resolved
 
 
 def execute_action(db: Session, action_id: str) -> None:
@@ -47,7 +73,7 @@ def execute_action(db: Session, action_id: str) -> None:
         adapter_input = AdapterInput(
             tool=action.tool,
             target=target_host,
-            params=action.params,
+            params=_resolve_params(db, action.params),
             risk_tier=action.tier.value if action.tier else "unknown",
             engagement_id=str(action.engagement_id),
         )
@@ -86,7 +112,7 @@ def execute_action(db: Session, action_id: str) -> None:
     db.commit()
 
 
-@celery_app.task(name="aegispen.run_action")
+@celery_app.task(name="wraithlink.run_action")
 def run_action_task(action_id: str) -> None:
     db = SessionLocal()
     try:

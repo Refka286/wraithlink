@@ -1,6 +1,7 @@
 import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
 
 from app.adapters.base import AdapterInput, ToolAdapter
 
@@ -18,8 +19,14 @@ class NmapAdapter(ToolAdapter):
             "version": ["-sV"],
         }
 
+        # targets are stored as full URLs for the HTTP-based tools (ffuf,
+        # nuclei, sqlmap) - nmap only accepts a bare hostname/IP as its
+        # target argument, so a scheme prefix must be stripped here
+        parsed = urlparse(adapter_input.target)
+        host = parsed.hostname or adapter_input.target
+
         command = ["nmap", *profile_flags.get(profile, ["-sS"]), "-p", ports, "-oX", str(output_path)]
-        command.append(adapter_input.target)
+        command.append(host)
         return command
 
     def parse_output(

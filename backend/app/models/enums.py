@@ -45,5 +45,6 @@ class FindingSeverity(str, enum.Enum):
 
 
 class UserRole(str, enum.Enum):
+    admin = "admin"
     pentester = "pentester"
     reader = "reader"

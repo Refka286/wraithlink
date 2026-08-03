@@ -27,7 +27,7 @@ function decodeToken(token: string): DecodedUser | null {
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<DecodedUser | null>(() => {
-    const stored = localStorage.getItem("aegispen_token");
+    const stored = localStorage.getItem("wraithlink_token");
     return stored ? decodeToken(stored) : null;
   });
 

@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.audit.log import append_entry
 from app.auth.deps import require_role
+from app.auth.scoping import get_authorized_engagement
 from app.database import get_db
 from app.models.action import Action
 from app.models.approval import Approval
@@ -23,11 +24,12 @@ def decide_approval(
     action_id: uuid.UUID,
     payload: ApprovalCreate,
     db: Session = Depends(get_db),
-    user: User = Depends(require_role(UserRole.pentester)),
+    user: User = Depends(require_role(UserRole.admin, UserRole.pentester)),
 ):
     action = db.get(Action, action_id)
     if action is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="action not found")
+    get_authorized_engagement(db, action.engagement_id, user)
 
     if action.status != ActionStatus.awaiting_approval:
         raise HTTPException(

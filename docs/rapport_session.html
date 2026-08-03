@@ -1,4 +1,4 @@
-<title>AegisPen — Rapport de Session d'Implémentation</title>
+<title>Wraithlink — Rapport de Session d'Implémentation</title>
 <style>
   @media (prefers-color-scheme: light) {
     :root { color-scheme: light; }
@@ -474,11 +474,11 @@
 <div class="shell">
 
   <div class="cover">
-    <div class="kicker"><span class="dot"></span>AegisPen — Journal de Développement</div>
+    <div class="kicker"><span class="dot"></span>Wraithlink — Journal de Développement</div>
     <h1>De l'amplification du plan de travail à une plateforme fonctionnelle en conteneurs</h1>
     <p class="subhead">Compte-rendu intégral de la session : les huit phases construites, les bugs réels découverts en testant contre une vraie stack Docker plutôt que supposés corrects, et l'état actuel du système en fonctionnement.</p>
     <div class="meta-row">
-      <div><strong>Projet</strong>AegisPen — PFE Refa</div>
+      <div><strong>Projet</strong>Wraithlink — PFE Refa</div>
       <div><strong>Portée</strong>Backend FastAPI + Frontend React + Docker Compose</div>
       <div><strong>Résultat</strong>49 tests automatisés, vérification bout-en-bout réelle</div>
       <div><strong>Environnement</strong>Windows, Docker Desktop, connexion réseau instable</div>
@@ -508,7 +508,7 @@
     <section id="origine">
       <h2><span class="idx">00</span>Origine de la demande</h2>
       <p class="lede">Deux temps distincts : d'abord amplifier un document de planification, ensuite le construire réellement.</p>
-      <p>La session a commencé par une demande d'amplification du fichier <code class="inline">Plan_de_Travail_AegisPen.md</code>, un plan de travail de PFE déjà structuré en 7 sections. Cette première passe a ajouté une formule de scoring de risque détaillée, un modèle de données PostgreSQL, une spécification API REST, un schéma JSON pour les adaptateurs d'outils, un diagramme de machine à états, une section sécurité de la plateforme elle-même, un planning détaillé par sprint et un registre de risques projet — faisant passer le document de 127 à environ 500 lignes.</p>
+      <p>La session a commencé par une demande d'amplification du fichier <code class="inline">Plan_de_Travail_Wraithlink.md</code>, un plan de travail de PFE déjà structuré en 7 sections. Cette première passe a ajouté une formule de scoring de risque détaillée, un modèle de données PostgreSQL, une spécification API REST, un schéma JSON pour les adaptateurs d'outils, un diagramme de machine à états, une section sécurité de la plateforme elle-même, un planning détaillé par sprint et un registre de risques projet — faisant passer le document de 127 à environ 500 lignes.</p>
       <p>Une tentative de transmettre ce plan à un outil de raffinement distant (Ultraplan) a échoué faute de dépôt Git initialisé — l'occasion de créer le premier commit du projet. Ensuite est venue la demande explicite : construire réellement la plateforme, phase par phase, sans s'arrêter, avec trois contraintes fermes — aucun emoji nulle part, du code sans ton IA, et une palette strictement rouge / bleu / noir pour le frontend.</p>
     </section>
 
@@ -537,7 +537,7 @@
 
     <section id="phase3">
       <h2><span class="idx">03</span>Moteur de risque, machine à états, audit</h2>
-      <p class="lede">Le cœur du positionnement d'AegisPen : transformer une formule de risque en décision automatique traçable.</p>
+      <p class="lede">Le cœur du positionnement d'Wraithlink : transformer une formule de risque en décision automatique traçable.</p>
       <div class="phase-card">
         <div class="phase-head"><h4>Phase 3 — Moteur de risque et porte d'approbation</h4><span class="status-chip done">terminé</span></div>
         <p>Formule <code class="inline">Score = Impact × Détectabilité / Réversibilité</code>, testée contre les six exemples chiffrés du plan de travail. Une règle dure force le tier <em>Interdit</em> dès que la réversibilité vaut 1, indépendamment du score — c'est ce qui bloque DCSync même si son score numérique reste inférieur au seuil.</p>
@@ -566,7 +566,7 @@
       <h3>Aperçu du rapport généré</h3>
       <p>Reconstruction fidèle du PDF réellement produit lors de la vérification finale contre l'engagement <code class="inline">Full Verification Engagement</code> — cible <code class="inline">10.10.10.5</code>, statut <code class="inline">exploitation</code>.</p>
       <div class="pdf-frame">
-        <p class="pf-title">AegisPen - Rapport d'Audit</p>
+        <p class="pf-title">Wraithlink - Rapport d'Audit</p>
         <p class="pf-sub">Full Verification Engagement</p>
         <p class="pf-meta">Statut de l'engagement : exploitation<br>Portée validée : oui<br>Généré le : 2026-07-30T00:37:12Z</p>
         <h5>Cibles</h5>
@@ -578,10 +578,10 @@
         </table>
         <h5>Journal d'Audit</h5>
         <table><tr><th>Acteur</th><th>Événement</th><th>Hash</th></tr>
-          <tr><td>pentester@aegispen.local</td><td>engagement_created</td><td>327a5281…</td></tr>
-          <tr><td>pentester@aegispen.local</td><td>action_submitted</td><td>9504106c…</td></tr>
+          <tr><td>pentester@wraithlink.local</td><td>engagement_created</td><td>327a5281…</td></tr>
+          <tr><td>pentester@wraithlink.local</td><td>action_submitted</td><td>9504106c…</td></tr>
           <tr><td>system</td><td>action_executed</td><td>fb378d23…</td></tr>
-          <tr><td>pentester@aegispen.local</td><td>approval_decision</td><td>b971a46f…</td></tr>
+          <tr><td>pentester@wraithlink.local</td><td>approval_decision</td><td>b971a46f…</td></tr>
         </table>
       </div>
       <p style="margin-top:14px; font-size:13.5px; color:var(--ink-400);">Le statut <code class="inline">failed</code> sur sqlmap dans cette capture est correct et attendu : au moment de la génération, sqlmap n'était pas encore installé dans le conteneur — l'adaptateur a signalé une erreur structurée plutôt que de fabriquer un faux résultat, exactement comme prévu par la conception.</p>
@@ -744,7 +744,7 @@
   </main>
 
   <footer>
-    <span>AegisPen — rapport généré à la fin de la session d'implémentation</span>
+    <span>Wraithlink — rapport généré à la fin de la session d'implémentation</span>
     <span>Palette : rouge / bleu / noir, sans exception</span>
   </footer>
 

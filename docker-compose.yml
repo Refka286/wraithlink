@@ -3,13 +3,13 @@ services:
     image: postgres:16-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-aegispen}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-aegispen}
-      POSTGRES_DB: ${POSTGRES_DB:-aegispen}
+      POSTGRES_USER: ${POSTGRES_USER:-wraithlink}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-wraithlink}
+      POSTGRES_DB: ${POSTGRES_DB:-wraithlink}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-aegispen}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-wraithlink}"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -30,7 +30,7 @@ services:
     env_file:
       - .env
     environment:
-      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-aegispen}:${POSTGRES_PASSWORD:-aegispen}@postgres:5432/${POSTGRES_DB:-aegispen}
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-wraithlink}:${POSTGRES_PASSWORD:-wraithlink}@postgres:5432/${POSTGRES_DB:-wraithlink}
       REDIS_URL: redis://redis:6379/0
     depends_on:
       postgres:
@@ -47,11 +47,19 @@ services:
       context: ./backend
     restart: unless-stopped
     command: celery -A app.tasks.celery_app worker --loglevel=info
+    cap_add:
+      - NET_RAW
+      - NET_ADMIN
     env_file:
       - .env
     environment:
-      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-aegispen}:${POSTGRES_PASSWORD:-aegispen}@postgres:5432/${POSTGRES_DB:-aegispen}
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-wraithlink}:${POSTGRES_PASSWORD:-wraithlink}@postgres:5432/${POSTGRES_DB:-wraithlink}
       REDIS_URL: redis://redis:6379/0
+      # the Debian nmap package isn't built with libcap-ng support, so nmap
+      # gates raw-socket scan types (-sS) behind an EUID==0 check regardless
+      # of actual capability bits - this tells it to trust the CAP_NET_RAW
+      # file capability granted on the binary (see backend/Dockerfile) instead
+      NMAP_PRIVILEGED: "1"
     depends_on:
       postgres:
         condition: service_healthy

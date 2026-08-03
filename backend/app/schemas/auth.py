@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict
 
@@ -16,3 +17,10 @@ class UserOut(BaseModel):
     id: uuid.UUID
     email: str
     role: UserRole
+    created_at: datetime
+
+
+class UserCreate(BaseModel):
+    email: str
+    password: str
+    role: UserRole = UserRole.reader

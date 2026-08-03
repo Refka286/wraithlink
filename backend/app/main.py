@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import router as api_router
 
-app = FastAPI(title="AegisPen", version="1.0.0")
+app = FastAPI(title="Wraithlink", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,

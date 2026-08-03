@@ -11,7 +11,7 @@ from app.models.user import User
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Create an AegisPen user account.")
+    parser = argparse.ArgumentParser(description="Create an Wraithlink user account.")
     parser.add_argument("email")
     parser.add_argument("password")
     parser.add_argument("--role", choices=[role.value for role in UserRole], default=UserRole.reader.value)

@@ -1,4 +1,5 @@
 import json
+import socket
 import zipfile
 from pathlib import Path
 from typing import Any
@@ -18,6 +19,16 @@ class BloodHoundAdapter(ToolAdapter):
         password = adapter_input.params.get("password", "")
         collection = adapter_input.params.get("collection_method", "All")
 
+        # bloodhound-python's -ns flag is passed straight to dnspython as a
+        # nameserver, which rejects hostnames outright (IP literals only) -
+        # targets are otherwise declared as hostnames throughout this app
+        # (see docs/LAB_SETUP.md), so resolve here rather than pushing that
+        # constraint onto whoever declares the target
+        try:
+            nameserver = socket.gethostbyname(adapter_input.target)
+        except socket.gaierror:
+            nameserver = adapter_input.target
+
         # the collector writes its own timestamped zip into the working
         # directory rather than accepting an explicit output path - exact
         # flag names vary a little between bloodhound-python versions, check
@@ -27,7 +38,7 @@ class BloodHoundAdapter(ToolAdapter):
             "-u", username,
             "-p", password,
             "-d", domain,
-            "-ns", adapter_input.target,
+            "-ns", nameserver,
             "-c", collection,
             "--zip",
         ]

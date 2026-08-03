@@ -3,30 +3,192 @@
 <head>
 <meta charset="utf-8">
 <style>
-  @page { margin: 2.2cm 1.8cm; }
-  body { font-family: "Helvetica Neue", Arial, sans-serif; color: #111111; font-size: 11pt; }
-  h1 { color: #b91c1c; font-size: 22pt; margin-bottom: 0; }
-  .subtitle { color: #1d4ed8; font-size: 12pt; margin-top: 4px; }
-  h2 { color: #111111; border-bottom: 2px solid #b91c1c; padding-bottom: 4px; margin-top: 28px; }
-  table { width: 100%; border-collapse: collapse; margin-top: 8px; }
-  th { background: #111111; color: #ffffff; text-align: left; padding: 6px 8px; font-size: 9.5pt; }
-  td { padding: 6px 8px; border-bottom: 1px solid #dddddd; font-size: 9.5pt; vertical-align: top; }
-  .severity-critical { color: #ffffff; background: #b91c1c; padding: 2px 6px; border-radius: 3px; }
-  .severity-high { color: #b91c1c; font-weight: bold; }
-  .severity-medium { color: #1d4ed8; font-weight: bold; }
-  .severity-low, .severity-info { color: #444444; }
+  @page {
+    size: A4;
+    margin: 2.6cm 1.8cm 2.2cm 1.8cm;
+    @top-center { content: element(pageHeader); }
+    @bottom-left { content: "Wraithlink — Rapport confidentiel"; font-size: 8pt; color: #6b7280; }
+    @bottom-right { content: "Page " counter(page) " / " counter(pages); font-size: 8pt; color: #6b7280; }
+  }
+  @page :first {
+    margin: 0;
+    @top-center { content: none; }
+    @bottom-left { content: none; }
+    @bottom-right { content: none; }
+  }
+
+  * { box-sizing: border-box; }
+  body { font-family: "Helvetica Neue", Arial, sans-serif; color: #111111; font-size: 10.5pt; line-height: 1.45; margin: 0; }
+
+  #page-header {
+    position: running(pageHeader);
+    font-size: 8pt;
+    color: #6b7280;
+    border-bottom: 0.5pt solid #d1d5db;
+    padding-bottom: 4pt;
+  }
+
+  h1 { color: #b91c1c; font-size: 20pt; margin: 0 0 4pt 0; }
+  h2 {
+    color: #111111;
+    font-size: 14pt;
+    border-bottom: 2px solid #b91c1c;
+    padding-bottom: 4px;
+    margin-top: 26px;
+    margin-bottom: 10px;
+    break-after: avoid-page;
+  }
+  h3 { font-size: 11pt; margin: 0; break-after: avoid-page; }
+
+  table { width: 100%; border-collapse: collapse; margin-top: 6px; }
+  th { background: #111111; color: #ffffff; text-align: left; padding: 6px 8px; font-size: 9pt; }
+  td { padding: 6px 8px; border-bottom: 1px solid #dddddd; font-size: 9pt; vertical-align: top; }
   .meta { color: #444444; font-size: 9.5pt; }
   .empty { color: #888888; font-style: italic; }
+  .nowrap { white-space: nowrap; }
+
+  /* canonical severity palette, shared with the frontend Badge component
+     and the Statistiques dashboard charts: critical/high red, medium amber,
+     low/info neutral gray */
+  .severity-critical { color: #ffffff; background: #b91c1c; padding: 2px 6px; border-radius: 3px; }
+  .severity-high { color: #dc2626; font-weight: bold; }
+  .severity-medium { color: #b45309; font-weight: bold; }
+  .severity-low, .severity-info { color: #444444; }
+
+  /* ---------- cover page ---------- */
+  .cover {
+    height: 29.7cm;
+    background: linear-gradient(160deg, #111111 0%, #1c1c1c 55%, #7f1d1d 100%);
+    color: #ffffff;
+    padding: 3.4cm 2.2cm;
+    break-after: page;
+  }
+  .cover-brand { display: flex; align-items: center; gap: 14pt; margin-bottom: 3.2cm; }
+  .cover-mark {
+    width: 52pt; height: 52pt; border-radius: 10pt;
+    background: #b91c1c; color: #ffffff;
+    font-size: 26pt; font-weight: bold;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .cover-wordmark { font-size: 17pt; font-weight: bold; letter-spacing: 1pt; }
+  .cover-tagline { font-size: 9pt; color: #d1d5db; margin-top: 2pt; }
+
+  .cover-eyebrow { font-size: 10pt; color: #fca5a5; text-transform: uppercase; letter-spacing: 2pt; margin-bottom: 10pt; }
+  .cover-title { font-size: 28pt; font-weight: bold; line-height: 1.25; margin-bottom: 10pt; }
+  .cover-client { font-size: 13pt; color: #e5e7eb; margin-bottom: 4pt; }
+  .cover-dates { font-size: 10.5pt; color: #d1d5db; }
+
+  .cover-status {
+    margin-top: 2.4cm;
+    padding: 12pt 16pt;
+    background: rgba(255, 255, 255, 0.08);
+    border-left: 3pt solid #b91c1c;
+    font-size: 10.5pt;
+    color: #f3f4f6;
+  }
+
+  .cover-footer { position: absolute; bottom: 2.4cm; font-size: 8.5pt; color: #9ca3af; }
+
+  /* ---------- executive summary ---------- */
+  .exec-summary-page { break-after: page; }
+
+  .stat-row { display: flex; gap: 10pt; margin: 14pt 0; }
+  .stat-tile {
+    flex: 1;
+    border: 1px solid #e5e7eb;
+    border-radius: 6pt;
+    padding: 10pt 8pt;
+    text-align: center;
+  }
+  .stat-tile .count { font-size: 20pt; font-weight: bold; display: block; }
+  .stat-tile .label { font-size: 8pt; color: #6b7280; text-transform: uppercase; letter-spacing: 0.4pt; }
+  .stat-tile.critical .count { color: #b91c1c; }
+  .stat-tile.high .count { color: #dc2626; }
+  .stat-tile.medium .count { color: #b45309; }
+  .stat-tile.low .count { color: #475569; }
+  .stat-tile.info .count { color: #9ca3af; }
+
+  .summary-panel {
+    border: 1px solid #e5e7eb;
+    border-radius: 6pt;
+    padding: 12pt 14pt;
+    margin-top: 10pt;
+    background: #fafafa;
+  }
+  .summary-metrics { display: flex; gap: 22pt; margin-top: 10pt; }
+  .summary-metrics div { font-size: 9.5pt; color: #374151; }
+  .summary-metrics strong { font-size: 13pt; display: block; color: #111111; }
+
+  /* ---------- findings grouped by severity ---------- */
+  .severity-header {
+    color: #ffffff;
+    padding: 6pt 10pt;
+    border-radius: 4pt 4pt 0 0;
+    font-size: 11pt;
+    font-weight: bold;
+    margin-top: 22pt;
+    break-after: avoid-page;
+  }
+  .severity-header.critical { background: #b91c1c; }
+  .severity-header.high { background: #dc2626; }
+  .severity-header.medium { background: #d97706; }
+  .severity-header.low { background: #64748b; }
+  .severity-header.info { background: #9ca3af; }
+  .severity-header + table { margin-top: 0; }
+
+  .approval-quote { border-left: 2pt solid #1d4ed8; padding-left: 8pt; color: #374151; }
 </style>
 </head>
 <body>
-  <h1>AegisPen - Rapport d'Audit</h1>
-  <div class="subtitle">{{ engagement.name }}</div>
-  <p class="meta">
-    Statut de l'engagement : {{ engagement.status.value }}<br>
-    Portee validee : {{ "oui" if engagement.scope_validated else "non" }}<br>
-    Genere le : {{ generated_at }}
-  </p>
+
+  <!-- ============ COVER PAGE ============ -->
+  <section class="cover">
+    <div class="cover-brand">
+      <div class="cover-mark">W</div>
+      <div>
+        <div class="cover-wordmark">WRAITHLINK</div>
+        <div class="cover-tagline">Plateforme d'audit offensif pilotee par le risque</div>
+      </div>
+    </div>
+
+    <div class="cover-eyebrow">Rapport d'Audit de Securite</div>
+    <div class="cover-title">{{ engagement.name }}</div>
+    <div class="cover-client">Client : {{ engagement.client_name or "Confidentiel" }}</div>
+    <div class="cover-dates">Periode de l'engagement : {{ date_range }}</div>
+
+    <div class="cover-status">
+      Statut de l'engagement : {{ status_label }} — {{ targets|length }} cible(s) evaluee(s), {{ total_actions }} action(s) executee(s), {{ total_findings }} constat(s) identifie(s).
+    </div>
+
+    <div class="cover-footer">
+      Document confidentiel — genere le {{ generated_at.strftime("%d/%m/%Y a %H:%M UTC") }} — a l'usage exclusif du destinataire
+    </div>
+  </section>
+
+  <div id="page-header">Wraithlink — {{ engagement.name }}</div>
+
+  <!-- ============ EXECUTIVE SUMMARY ============ -->
+  <section class="exec-summary-page">
+    <h2>Resume Executif</h2>
+
+    <div class="stat-row">
+      {% for severity in ["critical", "high", "medium", "low", "info"] %}
+      <div class="stat-tile {{ severity }}">
+        <span class="count">{{ severity_counts[severity] }}</span>
+        <span class="label">{{ severity_labels[severity] }}</span>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="summary-panel">
+      <p style="margin: 0;">{{ risk_posture }}</p>
+      <div class="summary-metrics">
+        <div><strong>{{ total_actions }}</strong>action(s) executee(s)</div>
+        <div><strong>{{ audit_summary.approval_decisions|length }}</strong>decision(s) d'approbation</div>
+        <div><strong>{{ targets|length }}</strong>cible(s) dans le perimetre</div>
+      </div>
+    </div>
+  </section>
 
   <h2>Cibles</h2>
   {% if targets %}
@@ -41,17 +203,27 @@
   {% endif %}
 
   <h2>Vulnerabilites Identifiees</h2>
-  {% if findings %}
-  <table>
-    <tr><th>Type</th><th>Severite</th><th>Description</th></tr>
-    {% for finding in findings %}
-    <tr>
-      <td>{{ finding.type }}</td>
-      <td><span class="severity-{{ finding.severity.value }}">{{ finding.severity.value }}</span></td>
-      <td>{{ finding.description }}</td>
-    </tr>
+  {% if finding_groups %}
+    {% for group in finding_groups %}
+    <div class="severity-header {{ group.severity }}">{{ group.label }} ({{ group.findings|length }})</div>
+    <table>
+      <colgroup>
+        <col style="width: 18%">
+        <col style="width: 9%">
+        <col style="width: 18%">
+        <col style="width: 55%">
+      </colgroup>
+      <tr><th>Type</th><th>Occurrences</th><th>Reference</th><th>Description</th></tr>
+      {% for finding in group.findings %}
+      <tr>
+        <td class="nowrap">{{ finding.type }}</td>
+        <td>{{ finding.count }}</td>
+        <td class="nowrap">{{ finding.reference }}</td>
+        <td>{{ finding.description }}</td>
+      </tr>
+      {% endfor %}
+    </table>
     {% endfor %}
-  </table>
   {% else %}
   <p class="empty">Aucune vulnerabilite enregistree.</p>
   {% endif %}
@@ -59,13 +231,21 @@
   <h2>Actions Executees</h2>
   {% if actions %}
   <table>
-    <tr><th>Outil</th><th>Tier</th><th>Score</th><th>Statut</th></tr>
+    <colgroup>
+      <col style="width: 16%">
+      <col style="width: 32%">
+      <col style="width: 18%">
+      <col style="width: 14%">
+      <col style="width: 20%">
+    </colgroup>
+    <tr><th>Outil</th><th>Cible</th><th>Tier</th><th>Score</th><th>Statut</th></tr>
     {% for action in actions %}
     <tr>
-      <td>{{ action.tool }}</td>
-      <td>{{ action.tier.value if action.tier else "-" }}</td>
+      <td class="nowrap">{{ action.tool }}</td>
+      <td>{{ action.target_host }}</td>
+      <td class="nowrap">{{ action.tier.value if action.tier else "-" }}</td>
       <td>{{ "%.2f"|format(action.risk_score) if action.risk_score is not none else "-" }}</td>
-      <td>{{ action.status.value }}</td>
+      <td class="nowrap">{{ action.status.value }}</td>
     </tr>
     {% endfor %}
   </table>
@@ -74,20 +254,31 @@
   {% endif %}
 
   <h2>Journal d'Audit</h2>
-  {% if audit_entries %}
+  {% if audit_summary.approval_decisions %}
+  <h3>Decisions d'approbation</h3>
   <table>
-    <tr><th>Horodatage</th><th>Acteur</th><th>Evenement</th><th>Hash</th></tr>
-    {% for entry in audit_entries %}
+    <colgroup>
+      <col style="width: 18%">
+      <col style="width: 20%">
+      <col style="width: 14%">
+      <col style="width: 48%">
+    </colgroup>
+    <tr><th>Horodatage</th><th>Approuve par</th><th>Option</th><th>Justification</th></tr>
+    {% for decision in audit_summary.approval_decisions %}
     <tr>
-      <td>{{ entry.created_at }}</td>
-      <td>{{ entry.actor }}</td>
-      <td>{{ entry.event_type }}</td>
-      <td class="meta">{{ entry.hash[:16] }}...</td>
+      <td class="nowrap">{{ decision.created_at.strftime("%d/%m/%Y %H:%M") }}</td>
+      <td>{{ decision.actor }}</td>
+      <td class="nowrap">{{ decision.option_chosen }}</td>
+      <td class="approval-quote">{{ decision.justification }}</td>
     </tr>
     {% endfor %}
   </table>
-  {% else %}
-  <p class="empty">Aucune entree de journal associee.</p>
   {% endif %}
+  <p class="meta" style="margin-top: 14px;">
+    {{ audit_summary.total_entries }} evenement(s) journalise(s) au total pour cet engagement
+    ({{ audit_summary.approval_decisions|length }} decision(s) d'approbation, {{ audit_summary.other_event_total }} autre(s) evenement(s)).
+    La chaine de hachage complete de ce journal est disponible sur demande.
+  </p>
+
 </body>
 </html>

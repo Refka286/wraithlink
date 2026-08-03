@@ -2,8 +2,9 @@ import uuid
 from datetime import datetime
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, computed_field
 
+from app.knowledge.error_format import shorten_error
 from app.models.enums import ActionStatus, RiskTier
 
 
@@ -27,3 +28,15 @@ class ActionOut(BaseModel):
     status: ActionStatus
     result: dict[str, Any] | None
     created_at: datetime
+
+    @computed_field
+    @property
+    def error_summary(self) -> str | None:
+        raw_error = self.result.get("error") if self.result else None
+        return shorten_error(str(raw_error)) if raw_error else None
+
+    @computed_field
+    @property
+    def note(self) -> str | None:
+        raw_note = self.result.get("note") if self.result else None
+        return str(raw_note) if raw_note else None

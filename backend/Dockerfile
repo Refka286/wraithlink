@@ -9,15 +9,23 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     nmap \
     sqlmap \
     ffuf \
+    dirb \
+    libcap2-bin \
     build-essential \
+    git \
+    rustc \
+    cargo \
     libpango-1.0-0 \
     libpangocairo-1.0-0 \
     libgdk-pixbuf-2.0-0 \
     libffi-dev \
     shared-mime-info \
+    && mkdir -p /usr/share/wordlists \
+    && ln -s /usr/share/dirb/wordlists /usr/share/wordlists/dirb \
+    && setcap cap_net_raw,cap_net_admin+eip /usr/bin/nmap \
     && rm -rf /var/lib/apt/lists/*
 
-RUN groupadd -r aegispen && useradd -r -g aegispen -d /app -s /usr/sbin/nologin aegispen
+RUN groupadd -r wraithlink && useradd -r -g wraithlink -d /app -s /usr/sbin/nologin wraithlink
 
 WORKDIR /app
 
@@ -26,9 +34,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-RUN mkdir -p /data/evidence && chown -R aegispen:aegispen /app /data/evidence
+RUN mkdir -p /data/evidence && chown -R wraithlink:wraithlink /app /data/evidence
 
-USER aegispen
+USER wraithlink
 
 EXPOSE 8000
 

@@ -8,9 +8,15 @@ pydantic-settings==2.5.2
 celery==5.4.0
 redis==5.0.8
 python-jose[cryptography]==3.3.0
+cryptography==42.0.8
 bcrypt==4.2.0
 weasyprint==69.0
 jinja2==3.1.4
 python-multipart==0.0.9
 pytest==8.3.3
-httpx==0.27.2
+httpx==0.28.1
+anthropic==0.120.2
+bloodhound==1.9.0
+# not published on PyPI - installed straight from upstream, tracks HEAD
+# rather than a pin (needs git+rustc+cargo present at build time, see Dockerfile)
+netexec @ git+https://github.com/Pennyw0rth/NetExec.git

@@ -4,4 +4,39 @@
 
 body {
   min-height: 100vh;
+  background-color: #05070d;
+}
+
+@layer components {
+  .grad-text {
+    @apply bg-gradient-to-r from-accent to-accent2 bg-clip-text text-transparent;
+  }
+
+  .panel {
+    @apply rounded-card border border-hairline bg-card p-6 transition-colors;
+  }
+
+  .panel-hover {
+    @apply hover:border-accent;
+  }
+
+  .btn-primary {
+    @apply rounded-lg bg-gradient-to-r from-accent to-accent2 px-5 py-2.5 text-sm font-bold text-night transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40;
+  }
+
+  .btn-danger {
+    @apply rounded-lg bg-red-700 px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-40;
+  }
+
+  .btn-secondary {
+    @apply rounded-lg border border-hairline px-5 py-2.5 text-sm font-semibold text-ink-100 transition-colors hover:border-accent;
+  }
+
+  .field {
+    @apply w-full rounded-lg border border-hairline bg-surface px-3 py-2 text-ink-50 outline-none transition-colors focus:border-accent;
+  }
+
+  .eyebrow {
+    @apply mb-3 block text-xs font-semibold uppercase tracking-[0.2em] text-accent;
+  }
 }

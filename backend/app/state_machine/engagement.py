@@ -1,6 +1,6 @@
 from app.models.enums import EngagementStatus, RiskTier
 
-# mirrors the state diagram in Plan_de_Travail_AegisPen.md section 6.3
+# mirrors the state diagram in Plan_de_Travail_Wraithlink.md section 6.3
 TRANSITIONS: dict[EngagementStatus, set[EngagementStatus]] = {
     EngagementStatus.scope_validation: {EngagementStatus.reconnaissance},
     # approval_pending is reachable straight from reconnaissance too: a
