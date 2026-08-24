@@ -1,5 +1,11 @@
-FROM golang:1.25-bookworm AS nuclei-builder
-RUN go install github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
+# syntax=docker/dockerfile:1
+FROM golang:1.26-bookworm AS nuclei-builder
+# cache mounts persist across builds (unlike a plain layer, which is
+# discarded whole when the RUN fails) - a network blip partway through no
+# longer means every already-fetched module gets re-downloaded on retry
+RUN --mount=type=cache,target=/root/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+    go install github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
 
 FROM python:3.11-slim
 
@@ -30,7 +36,11 @@ RUN groupadd -r wraithlink && useradd -r -g wraithlink -d /app -s /usr/sbin/nolo
 WORKDIR /app
 
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# same reasoning as the go cache mounts above: keeps already-downloaded
+# wheels around across a failed/retried build instead of losing them with
+# the rest of the layer
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install -r requirements.txt
 
 COPY . .
 

@@ -1,3 +1,4 @@
+from app.adapters.acunetix import AcunetixAdapter, AcunetixNotConfiguredError
 from app.adapters.base import AdapterInput, AdapterOutput, ToolAdapter, ToolNotInstalledError
 from app.adapters.bloodhound import BloodHoundAdapter
 from app.adapters.ffuf import FfufAdapter
@@ -15,6 +16,7 @@ REGISTRY: dict[str, type[ToolAdapter]] = {
     "bloodhound": BloodHoundAdapter,
     "sqlmap": SqlmapAdapter,
     "zap": ZapAdapter,
+    "acunetix": AcunetixAdapter,
 }
 
 __all__ = [
@@ -22,5 +24,6 @@ __all__ = [
     "AdapterOutput",
     "ToolAdapter",
     "ToolNotInstalledError",
+    "AcunetixNotConfiguredError",
     "REGISTRY",
 ]

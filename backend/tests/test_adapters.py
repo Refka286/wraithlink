@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 
+from app.adapters.acunetix import AcunetixAdapter
 from app.adapters.base import AdapterInput, ToolNotInstalledError
 from app.adapters.ffuf import FfufAdapter
 from app.adapters.nmap import NmapAdapter
@@ -114,3 +115,14 @@ def test_adapter_run_reports_missing_binary():
 
     assert output.status == "error"
     assert "not installed" in output.error
+
+
+def test_acunetix_run_reports_not_configured():
+    # no ACUNETIX_API_KEY/ACUNETIX_BASE_URL is set in the test environment,
+    # which mirrors production until a commercial license is available -
+    # the adapter must fail clearly instead of crashing or hanging on a
+    # real HTTP call
+    output = AcunetixAdapter().run(dummy_input("acunetix"))
+
+    assert output.status == "error"
+    assert "not configure" in output.error.lower() or "licence" in output.error.lower()

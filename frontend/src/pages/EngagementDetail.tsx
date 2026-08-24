@@ -67,6 +67,7 @@ const KNOWN_TOOLS = [
   { tool: "nuclei", profile: "default", label: "nuclei - templates par defaut (automatique)", category: "Web" },
   { tool: "nuclei", profile: "aggressive", label: "nuclei - mode agressif (approbation)", category: "Web" },
   { tool: "sqlmap", profile: "aggressive", label: "sqlmap - mode agressif (approbation)", category: "Web" },
+  { tool: "acunetix", profile: "full-scan", label: "Acunetix - scan complet (approbation, licence requise)", category: "Web" },
   { tool: "bloodhound", profile: "collect", label: "bloodhound - collecte LDAP/SMB (automatique)", category: "Active Directory" },
   { tool: "netexec", profile: "kerberoast", label: "netexec - kerberoasting (approbation)", category: "Active Directory" },
   { tool: "netexec", profile: "dcsync", label: "netexec - dcsync (interdit)", category: "Active Directory" },

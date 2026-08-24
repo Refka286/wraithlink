@@ -196,4 +196,44 @@ TOOLS: dict[str, dict] = {
             },
         },
     },
+    "acunetix": {
+        "label": "Acunetix",
+        "what_is": (
+            "Un scanner de vulnerabilites web commercial (DAST), utilise pour detecter des failles "
+            "applicatives (injections, XSS, mauvaises configurations...) via des attaques actives "
+            "envoyees directement a la cible."
+        ),
+        "how_it_works": (
+            "Acunetix s'utilise via son API REST plutot qu'en ligne de commande : la plateforme cree "
+            "une cible (target), lance un scan avec un profil donne, puis interroge periodiquement "
+            "l'etat du scan jusqu'a completion avant de recuperer la liste des vulnerabilites "
+            "detectees. Le profil 'full-scan' active l'ensemble des tests, y compris des sondes "
+            "actives (injection de payloads) qui modifient le comportement observe de la cible."
+        ),
+        "example_finding": {
+            "type": "xss_reflected",
+            "description": "Injection XSS reflechie detectee sur le parametre 'q' de /search.",
+        },
+        "profiles": {
+            "full-scan": {
+                "label": "Scan complet",
+                "explanation": (
+                    "Execute l'integralite des tests Acunetix (DeepScan, injections, XSS, "
+                    "configurations) : couverture maximale au prix d'un trafic d'attaque actif et "
+                    "visible, comparable a un scan actif ZAP."
+                ),
+            },
+        },
+        # honest disclosure surfaced verbatim on the "Outils" reference page -
+        # see AcunetixAdapter (app/adapters/acunetix.py): it returns a clear
+        # "not configured" error instead of running until this changes
+        "license_note": (
+            "Acunetix necessite une licence commerciale non disponible actuellement sur cette "
+            "plateforme. L'adapteur est implemente et pret a l'integration (architecture API REST : "
+            "creation de cible, lancement de scan, recuperation des vulnerabilites) mais n'a pas ete "
+            "teste contre une instance reelle faute d'acces. Tant qu'aucune cle API n'est configuree "
+            "(ACUNETIX_API_KEY / ACUNETIX_BASE_URL), toute tentative d'execution renvoie une erreur "
+            "explicite plutot que d'echouer silencieusement."
+        ),
+    },
 }

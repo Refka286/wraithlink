@@ -30,3 +30,4 @@ class ToolOut(BaseModel):
     how_it_works: str
     example_finding: ToolFindingExampleOut
     profiles: list[ToolProfileOut]
+    license_note: str | None = None

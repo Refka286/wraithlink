@@ -31,7 +31,12 @@ class ZapAdapter(ToolAdapter):
                     {
                         "type": alert.get("alertRef", alert.get("pluginid", "unknown")),
                         "name": alert.get("name"),
-                        "risk": risk,
+                        # must be named "severity", not "risk" - this is the key
+                        # app.tasks.run_action._severity_from() reads to set the
+                        # stored Finding.severity; a mismatched key here silently
+                        # collapses every ZAP finding to "info" regardless of its
+                        # real ZAP risk level
+                        "severity": risk,
                         "confidence": "medium",
                     }
                 )

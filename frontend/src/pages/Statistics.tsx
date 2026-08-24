@@ -4,6 +4,7 @@ import {
   BarChart,
   CartesianGrid,
   Cell,
+  LabelList,
   Legend,
   Pie,
   PieChart,
@@ -135,10 +136,11 @@ export function Statistics() {
             <XAxis dataKey="label" tick={{ fill: "#a1a1aa", fontSize: 12 }} axisLine={{ stroke: "rgba(255,255,255,0.1)" }} />
             <YAxis allowDecimals={false} tick={{ fill: "#a1a1aa", fontSize: 12 }} axisLine={{ stroke: "rgba(255,255,255,0.1)" }} />
             <Tooltip contentStyle={tooltipStyle} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
-            <Bar dataKey="count" radius={[4, 4, 0, 0]}>
+            <Bar dataKey="count" radius={[4, 4, 0, 0]} minPointSize={2}>
               {severityData.map((entry) => (
                 <Cell key={entry.severity} fill={SEVERITY_COLORS[entry.severity]} />
               ))}
+              <LabelList dataKey="count" position="top" style={{ fill: "#a1a1aa", fontSize: 11 }} />
             </Bar>
           </BarChart>
         </ResponsiveContainer>

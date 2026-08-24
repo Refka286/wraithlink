@@ -146,4 +146,5 @@ export interface ToolReference {
   how_it_works: string;
   example_finding: { type: string; description: string };
   profiles: ToolProfile[];
+  license_note?: string | null;
 }

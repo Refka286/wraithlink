@@ -40,8 +40,17 @@ export function Tools() {
       <div className="space-y-6">
         {tools.map((tool) => (
           <section key={tool.tool} className="panel">
-            <h2 className="text-lg font-semibold text-ink-50">{tool.label}</h2>
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="text-lg font-semibold text-ink-50">{tool.label}</h2>
+              {tool.license_note && <Badge tone="warning">Licence requise</Badge>}
+            </div>
             <p className="mt-2 text-sm text-ink-200">{tool.what_is}</p>
+
+            {tool.license_note && (
+              <div className="mt-3 rounded-lg border border-warning/40 bg-warning/10 p-3">
+                <p className="text-sm text-warning">{tool.license_note}</p>
+              </div>
+            )}
 
             <div className="mt-4">
               <p className="eyebrow !mb-2">Fonctionnement technique</p>

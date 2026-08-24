@@ -22,6 +22,16 @@ class Settings(BaseSettings):
     # credentials; generate with `Fernet.generate_key()`
     credentials_encryption_key: str = ""
 
+    # Acunetix is a commercially-licensed, API-driven scanner - no key is
+    # provisioned in this deployment, so AcunetixAdapter always returns a
+    # "not configured" error until these are set (see app/adapters/acunetix.py)
+    acunetix_api_key: str = ""
+    acunetix_base_url: str = ""
+    # most self-hosted Acunetix instances present a self-signed certificate;
+    # default stays True (verify) so a misconfigured deployment fails closed
+    # instead of silently accepting any certificate
+    acunetix_verify_tls: bool = True
+
 
 @lru_cache
 def get_settings() -> Settings:

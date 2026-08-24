@@ -27,6 +27,7 @@ DEFAULT_PROFILES = {
     "netexec": "kerberoast",
     "bloodhound": "collect",
     "zap": "active-scan",
+    "acunetix": "full-scan",
 }
 
 

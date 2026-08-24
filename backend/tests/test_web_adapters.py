@@ -81,7 +81,7 @@ def test_zap_parse_output_extracts_alerts(tmp_path: Path):
     findings = ZapAdapter().parse_output(dummy_input("zap"), output_path, "")
 
     assert findings == [
-        {"type": "40018", "name": "SQL Injection", "risk": "high", "confidence": "medium"}
+        {"type": "40018", "name": "SQL Injection", "severity": "high", "confidence": "medium"}
     ]
 
 

@@ -70,6 +70,7 @@ def list_tools(
                 "how_it_works": tool_info["how_it_works"],
                 "example_finding": tool_info["example_finding"],
                 "profiles": profiles,
+                "license_note": tool_info.get("license_note"),
             }
         )
 

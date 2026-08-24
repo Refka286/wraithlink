@@ -21,6 +21,11 @@ CATALOG: dict[str, RiskRating] = {
     # sqlmap:aggressive entry - the plan explicitly keeps this out of the
     # automatic tier regardless of numeric score
     "zap:active-scan": RiskRating(impact=3, detectability=4, reversibility=4, sensitive=True),
+    # Acunetix's full scan sends live attack traffic (XSS/SQLi/etc. probes)
+    # against every discovered page, same nature as zap:active-scan above -
+    # rated identically pending real-world validation once a license/API key
+    # is available (see app/adapters/acunetix.py)
+    "acunetix:full-scan": RiskRating(impact=3, detectability=4, reversibility=4, sensitive=True),
 }
 
 
