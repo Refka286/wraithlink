@@ -18,8 +18,10 @@ SYSTEM_PROMPT = (
     "engagement scope, actions already run, and findings so far, suggest 2-4 "
     "concrete next actions from this list of available tools: nmap, ffuf, "
     "nuclei, sqlmap, netexec, bloodhound, zap. For each suggestion give: tool "
-    "name, reasoning, and priority (high/medium/low). Respond ONLY in JSON: "
-    '{"suggestions": [{"tool": "", "reasoning": "", "priority": ""}]}'
+    "name, reasoning (2-3 sentences max, referencing specific findings by "
+    "port/path/type where relevant), and priority (high/medium/low). Respond "
+    'ONLY in JSON, with no markdown code fences: {"suggestions": '
+    '[{"tool": "", "reasoning": "", "priority": ""}]}'
 )
 
 # a single noisy scan (or a long-running engagement) can produce thousands
@@ -108,7 +110,7 @@ def get_suggestions(engagement_id: uuid.UUID, db: Session) -> dict:
 
     response = client.messages.create(
         model="claude-sonnet-5",
-        max_tokens=1024,
+        max_tokens=2048,
         system=SYSTEM_PROMPT,
         messages=[{"role": "user", "content": context}],
     )
@@ -118,7 +120,15 @@ def get_suggestions(engagement_id: uuid.UUID, db: Session) -> dict:
     try:
         return json.loads(raw_text)
     except json.JSONDecodeError as exc:
+        # surface *why* parsing failed rather than a bare 502 - a truncated
+        # response (stop_reason="max_tokens") is a different, fixable
+        # problem from the model genuinely returning malformed JSON
+        reason = (
+            "response was truncated before it finished (hit the token limit)"
+            if response.stop_reason == "max_tokens"
+            else "model did not return valid JSON"
+        )
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
-            detail="AI response was not valid JSON",
+            detail=f"AI response was not valid JSON: {reason}",
         ) from exc
